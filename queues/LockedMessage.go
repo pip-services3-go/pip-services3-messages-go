@@ -1,0 +1,27 @@
+package queues
+
+import "time"
+
+/**
+ * Data object used to store and lock incoming messages
+ * in [[MemoryMessageQueue]].
+ *
+ * @see [[MemoryMessageQueue]]
+ */
+type LockedMessage struct {
+	/**
+	 * The incoming message.
+	 */
+	Message MessageEnvelope
+
+	/**
+	 * The expiration time for the message lock.
+	 * If it is null then the message is not locked.
+	 */
+	ExpirationTime time.Time
+
+	/**
+	 * The lock timeout in milliseconds.
+	 */
+	Timeout time.Duration
+}
