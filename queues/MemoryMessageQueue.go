@@ -1,452 +1,427 @@
 package queues
 
-/**
- * Message queue that sends and receives messages within the same process by using shared memory.
- *
- * This queue is typically used for testing to mock real queues.
- *
- * ### Configuration parameters ###
- *
- * - name:                        name of the message queue
- *
- * ### References ###
- *
- * - <code>\*:logger:\*:\*:1.0</code>           (optional) [[https://rawgit.com/pip-services-node/pip-services3-components-node/master/doc/api/interfaces/log.ilogger.html ILogger]] components to pass log messages
- * - <code>\*:counters:\*:\*:1.0</code>         (optional) [[https://rawgit.com/pip-services-node/pip-services3-components-node/master/doc/api/interfaces/count.icounters.html ICounters]] components to pass collected measurements
- *
- * @see [[MessageQueue]]
- * @see [[MessagingCapabilities]]
- *
- * ### Example ###
- *
- *     let queue = new MessageQueue("myqueue");
- *
- *     queue.send("123", new MessageEnvelop(null, "mymessage", "ABC"));
- *
- *     queue.receive("123", (err, message) => {
- *         if (message != null) {
- *            ...
- *            queue.complete("123", message);
- *         }
- *     });
- */
+import (
+	"sync"
+	"time"
+
+	"github.com/pip-services3-go/pip-services3-components-go/auth"
+	ccon "github.com/pip-services3-go/pip-services3-components-go/connect"
+)
+
+/*
+Message queue that sends and receives messages within the same process by using shared memory.
+
+This queue is typically used for testing to mock real queues.
+
+ Configuration parameters
+
+- name:                        name of the message queue
+
+ References
+
+- *:logger:*:*:1.0           (optional)  ILogger components to pass log messages
+- *:counters:*:*:1.0         (optional)  ICounters components to pass collected measurements
+
+See MessageQueue
+See MessagingCapabilities
+
+ Example
+
+    let queue = new MessageQueue("myqueue");
+
+    queue.send("123", new MessageEnvelop(null, "mymessage", "ABC"));
+
+    queue.receive("123", (err, message) => {
+        if (message != null) {
+           ...
+           queue.complete("123", message);
+        }
+    });
+*/
 type MemoryMessageQueue struct {
 	MessageQueue
 	messages          []MessageEnvelope
 	lockTokenSequence int
-	//lockedMessages { [id: number]: LockedMessage; } = {};
-	opened bool
-	/** Used to stop the listening process. */
+	lockedMessages    map[int]*LockedMessage //lockedMessages { [id: number]: LockedMessage; } = {};
+	opened            bool
+	/* Used to stop the listening process. */
 	cancel bool
 }
 
-/**
- * Creates a new instance of the message queue.
- *
- * @param name  (optional) a queue name.
- *
- * @see [[MessagingCapabilities]]
- */
+/*
+Creates a new instance of the message queue.
+
+- name  (optional) a queue name.
+
+See MessagingCapabilities
+*/
 func NewMemoryMessageQueue(name string) *MemoryMessageQueue {
 	mmq := MemoryMessageQueue{}
 	mmq.MessageQueue = *NewMessageQueue(name)
+
+	mmq.MessageQueue.IMessageQueue = &mmq
+
 	mmq.messages = make([]MessageEnvelope, 0)
 	mmq.lockTokenSequence = 0
-	//mmq.lockedMessages { [id: number]: LockedMessage; } = {};
+	mmq.lockedMessages = make(map[int]*LockedMessage, 0)
 	mmq.opened = false
 	mmq.cancel = false
 	mmq.Capabilities = NewMessagingCapabilities(true, true, true, true, true, true, true, false, true)
 	return &mmq
 }
 
-// /**
-//  * Checks if the component is opened.
-//  *
-//  * @returns true if the component has been opened and false otherwise.
-//  */
-// public isOpen(): boolean {
-//     return this.opened;
-// }
+/*
+Checks if the component is opened.
 
-// /**
-//  * Opens the component with given connection and credential parameters.
-//  *
-//  * @param correlationId     (optional) transaction id to trace execution through call chain.
-//  * @param connection        connection parameters
-//  * @param credential        credential parameters
-//  * @param callback 			callback function that receives error or null no errors occured.
-//  */
-// protected openWithParams(correlationId: string, connection: ConnectionParams, credential: CredentialParams, callback: (err: any) => void): void {
-//     this.opened = true;
-//     callback(null);
-// }
+Return true if the component has been opened and false otherwise.
+*/
+func (c *MemoryMessageQueue) IsOpen() bool {
+	return c.opened
+}
 
-// /**
-//  * Closes component and frees used resources.
-//  *
-//  * @param correlationId 	(optional) transaction id to trace execution through call chain.
-//  * @param callback 			callback function that receives error or null no errors occured.
-//  */
-// public close(correlationId: string, callback: (err: any) => void): void {
-//     this.opened = false;
-//     this.cancel = true;
-//     this._logger.trace(correlationId, "Closed queue %s", this);
-//     callback(null);
-// }
+/*
+Opens the component with given connection and credential parameters.
+ *
+- correlationId     (optional) transaction id to trace execution through call chain.
+- connection        connection parameters
+- credential        credential parameters
+- callback 			callback function that receives error or null no errors occured.
+*/
+func (c *MemoryMessageQueue) OpenWithParams(correlationId string, connection *ccon.ConnectionParams, credential *auth.CredentialParams) (err error) {
+	c.opened = true
+	return nil
+}
 
-// /**
-//  * Clears component state.
-//  *
-//  * @param correlationId 	(optional) transaction id to trace execution through call chain.
-//  * @param callback 			callback function that receives error or null no errors occured.
-//  */
-// public clear(correlationId: string, callback: (err?: any) => void): void {
-//     this.messages = [];
-//     this.lockedMessages = {};
-//     this.cancel = false;
+/*
+Closes component and frees used resources.
+ *
+- correlationId 	(optional) transaction id to trace execution through call chain.
+- callback 			callback function that receives error or null no errors occured.
+*/
+func (c *MemoryMessageQueue) Close(correlationId string) (err error) {
+	c.opened = false
+	c.cancel = true
+	c.Logger.Trace(correlationId, "Closed queue %s", c)
+	return nil
+}
 
-//     callback();
-// }
+/*
+Clears component state.
+ *
+- correlationId 	(optional) transaction id to trace execution through call chain.
+- callback 			callback function that receives error or null no errors occured.
+*/
+func (c *MemoryMessageQueue) Clear(correlationId string) (err error) {
+	c.messages = c.messages[:0]
+	c.lockedMessages = make(map[int]*LockedMessage, 0)
+	c.cancel = false
+	return nil
+}
 
-// /**
-//  * Reads the current number of messages in the queue to be delivered.
-//  *
-//  * @param callback      callback function that receives number of messages or error.
-//  */
-// public readMessageCount(callback: (err: any, count: number) => void): void {
-//     let count = this.messages.length;
-//     callback(null, count);
-// }
+/*
+Reads the current number of messages in the queue to be delivered.
+ *
+- callback      callback function that receives number of messages or error.
+*/
+func (c *MemoryMessageQueue) ReadMessageCount() (count int64, err error) {
+	count = (int64)(len(c.messages))
+	return count, nil
+}
 
-// /**
-//  * Sends a message into the queue.
-//  *
-//  * @param correlationId     (optional) transaction id to trace execution through call chain.
-//  * @param envelope          a message envelop to be sent.
-//  * @param callback          (optional) callback function that receives error or null for success.
-//  */
-// public send(correlationId: string, envelope: MessageEnvelope, callback?: (err: any) => void): void {
-//     try {
-//         envelope.sent_time = new Date();
-//         // Add message to the queue
-//         this.messages.push(envelope);
+/*
+Sends a message into the queue.
+ *
+- correlationId     (optional) transaction id to trace execution through call chain.
+- envelope          a message envelop to be sent.
+- callback          (optional) callback function that receives error or null for success.
+*/
+func (c *MemoryMessageQueue) Send(correlationId string, envelope *MessageEnvelope) (err error) {
 
-//         this._counters.incrementOne("queue." + this.getName() + ".sentmessages");
-//         this._logger.debug(envelope.correlation_id, "Sent message %s via %s", envelope.toString(), this.toString());
+	envelope.Sent_time = time.Now()
+	// Add message to the queue
+	c.messages = append(c.messages, *envelope)
+	c.Counters.IncrementOne("queue." + c.GetName() + ".sentmessages")
+	c.Logger.Debug(envelope.Correlation_id, "Sent message %s via %s", envelope.ToString(), c.ToString())
+	return nil
+}
 
-//         if (callback) callback(null);
-//     } catch (ex) {
-//         if (callback) callback(ex);
-//         else throw ex;
-//     }
-// }
+/*
+Peeks a single incoming message from the queue without removing it.
+If there are no messages available in the queue it returns null.
+ *
+- correlationId     (optional) transaction id to trace execution through call chain.
+- callback          callback function that receives a message or error.
+*/
+func (c *MemoryMessageQueue) Peek(correlationId string) (result *MessageEnvelope, err error) {
+	var message MessageEnvelope
+	// Pick a message
+	if len(c.messages) > 0 {
+		message = c.messages[0]
+		c.Logger.Trace(message.Correlation_id, "Peeked message %s on %s", message, c.ToString())
+		return &message, nil
+	}
+	return nil, nil
+}
 
-// /**
-//  * Peeks a single incoming message from the queue without removing it.
-//  * If there are no messages available in the queue it returns null.
-//  *
-//  * @param correlationId     (optional) transaction id to trace execution through call chain.
-//  * @param callback          callback function that receives a message or error.
-//  */
-// public peek(correlationId: string, callback: (err: any, result: MessageEnvelope) => void): void {
-//     try {
-//         let message: MessageEnvelope = null;
+/*
+Peeks multiple incoming messages from the queue without removing them.
+If there are no messages available in the queue it returns an empty list.
+ *
+- correlationId     (optional) transaction id to trace execution through call chain.
+- messageCount      a maximum number of messages to peek.
+- callback          callback function that receives a list with messages or error.
+*/
+func (c *MemoryMessageQueue) PeekBatch(correlationId string, messageCount int64) (result []MessageEnvelope, err error) {
 
-//         // Pick a message
-//         if (this.messages.length > 0)
-//             message = this.messages[0];
+	var messages []MessageEnvelope = make([]MessageEnvelope, 0, 0)
+	if messageCount <= (int64)(len(c.messages)) {
+		messages = c.messages[0:messageCount]
+	}
+	c.Logger.Trace(correlationId, "Peeked %d messages on %s", len(messages), c.ToString())
+	return messages, nil
+}
 
-//         if (message != null)
-//             this._logger.trace(message.correlation_id, "Peeked message %s on %s", message, this.toString());
+/*
+Receives an incoming message and removes it from the queue.
+ *
+- correlationId     (optional) transaction id to trace execution through call chain.
+- waitTimeout       a timeout in milliseconds to wait for a message to come.
+- callback          callback function that receives a message or error.
+*/
+func (c *MemoryMessageQueue) Receive(correlationId string, waitTimeout time.Duration) (result *MessageEnvelope, err error) {
+	err = nil
+	var message *MessageEnvelope
+	var messageReceived bool = false
 
-//         callback(null, message);
-//     } catch (ex) {
-//         callback(ex, null);
-//     }
-// }
+	var checkIntervalMs time.Duration = 100 * time.Millisecond
+	var i time.Duration = 0
 
-// /**
-//  * Peeks multiple incoming messages from the queue without removing them.
-//  * If there are no messages available in the queue it returns an empty list.
-//  *
-//  * @param correlationId     (optional) transaction id to trace execution through call chain.
-//  * @param messageCount      a maximum number of messages to peek.
-//  * @param callback          callback function that receives a list with messages or error.
-//  */
-// public peekBatch(correlationId: string, messageCount: number, callback: (err: any, result: MessageEnvelope[]) => void): void {
-//     try {
-//         let messages = this.messages.slice(0, messageCount);
+	var wg = sync.WaitGroup{}
+	wg.Add(1)
+	go func() {
 
-//         this._logger.trace(correlationId, "Peeked %d messages on %s", messages.length, this.toString());
+		for i < waitTimeout && !messageReceived {
+			i = i + checkIntervalMs
 
-//         callback(null, messages);
-//     } catch (ex) {
-//         callback(ex, null);
-//     }
-// }
+			time.AfterFunc(checkIntervalMs, func() {
+				if len(c.messages) == 0 {
+					return
+				}
+				// Get message from the queue
+				// shift queue
+				var msg MessageEnvelope
+				message = nil
+				for len(c.messages) > 0 {
+					msg, c.messages = c.messages[0], c.messages[1:]
+					message = &msg
+				}
 
-// /**
-//  * Receives an incoming message and removes it from the queue.
-//  *
-//  * @param correlationId     (optional) transaction id to trace execution through call chain.
-//  * @param waitTimeout       a timeout in milliseconds to wait for a message to come.
-//  * @param callback          callback function that receives a message or error.
-//  */
-// public receive(correlationId: string, waitTimeout: number, callback: (err: any, result: MessageEnvelope) => void): void {
-//     let err: any = null;
-//     let message: MessageEnvelope = null;
-//     let messageReceived: boolean = false;
+				if message != nil {
+					// Generate and set locked token
+					lockedToken := c.lockTokenSequence
+					c.lockTokenSequence++
+					message.SetReference(lockedToken)
 
-//     let checkIntervalMs = 100;
-//     let i = 0;
-//     async.whilst(
-//         () => {
-//             return i < waitTimeout && !messageReceived;
-//         },
-//         (whilstCallback) => {
-//             i = i + checkIntervalMs;
+					// Add messages to locked messages list
+					var lockedMessage LockedMessage = LockedMessage{}
+					var now time.Time = time.Now()
+					now = (now.Add(waitTimeout))
+					lockedMessage.ExpirationTime = now
+					lockedMessage.Message = message
+					lockedMessage.Timeout = waitTimeout
+					c.lockedMessages[lockedToken] = &lockedMessage
 
-//             setTimeout(() => {
-//                 if (this.messages.length == 0) {
-//                     whilstCallback();
-//                     return;
-//                 }
+					c.Counters.IncrementOne("queue." + c.GetName() + ".receivedmessages")
+					c.Logger.Debug(message.Correlation_id, "Received message %s via %s", message, c.ToString())
+				}
 
-//                 try {
-//                     // Get message the the queue
-//                     message = this.messages.shift();
+				messageReceived = true
+			})
+		}
 
-//                     if (message != null) {
-//                         // Generate and set locked token
-//                         var lockedToken = this.lockTokenSequence++;
-//                         message.setReference(lockedToken);
+		wg.Done()
+	}()
 
-//                         // Add messages to locked messages list
-//                         let lockedMessage: LockedMessage = new LockedMessage();
-//                         let now: Date = new Date();
-//                         now.setMilliseconds(now.getMilliseconds() + waitTimeout);
-//                         lockedMessage.expirationTime = now;
-//                         lockedMessage.message = message;
-//                         lockedMessage.timeout = waitTimeout;
-//                         this.lockedMessages[lockedToken] = lockedMessage;
-//                     }
+	wg.Wait()
 
-//                     if (message != null) {
-//                         this._counters.incrementOne("queue." + this.getName() + ".receivedmessages");
-//                         this._logger.debug(message.correlation_id, "Received message %s via %s", message, this.toString());
-//                     }
-//                 } catch (ex) {
-//                     err = ex;
-//                 }
+	return message, err
+}
 
-//                 messageReceived = true;
-//                 whilstCallback();
-//             }, checkIntervalMs);
-//         },
-//         (err) => {
-//             callback(err, message);
-//         }
-//     );
-// }
+/*
+Renews a lock on a message that makes it invisible from other receivers in the queue.
+This method is usually used to extend the message processing time.
+ *
+- message       a message to extend its lock.
+- lockTimeout   a locking timeout in milliseconds.
+- callback      (optional) callback function that receives an error or null for success.
+*/
+func (c *MemoryMessageQueue) RenewLock(message *MessageEnvelope, lockTimeout time.Duration) (err error) {
 
-// /**
-//  * Renews a lock on a message that makes it invisible from other receivers in the queue.
-//  * This method is usually used to extend the message processing time.
-//  *
-//  * @param message       a message to extend its lock.
-//  * @param lockTimeout   a locking timeout in milliseconds.
-//  * @param callback      (optional) callback function that receives an error or null for success.
-//  */
-// public renewLock(message: MessageEnvelope, lockTimeout: number, callback?: (err: any) => void): void {
-//     if (message.getReference() == null) {
-//         if (callback) callback(null);
-//         return;
-//     }
+	reference := message.GetReference()
+	if reference == nil {
+		return nil
+	}
+	// Get message from locked queue
+	lockedToken, ok := reference.(int)
+	if !ok {
+		return nil
+	}
+	lockedMessage, ok := c.lockedMessages[lockedToken]
+	// If lock is found, extend the lock
+	if ok {
+		var now time.Time = time.Now()
+		// Todo: Shall we skip if the message already expired?
+		if lockedMessage.ExpirationTime.Unix() > now.Unix() {
+			now = now.Add(lockedMessage.Timeout)
+			lockedMessage.ExpirationTime = now
+		}
+	}
 
-//     // Get message from locked queue
-//     try {
-//         let lockedToken: number = message.getReference();
-//         let lockedMessage: LockedMessage = this.lockedMessages[lockedToken];
+	c.Logger.Trace(message.Correlation_id, "Renewed lock for message %s at %s", message, c.ToString())
+	return nil
+}
 
-//         // If lock is found, extend the lock
-//         if (lockedMessage) {
-//             let now: Date = new Date();
-//             // Todo: Shall we skip if the message already expired?
-//             if (lockedMessage.expirationTime > now) {
-//                 now.setMilliseconds(now.getMilliseconds() + lockedMessage.timeout);
-//                 lockedMessage.expirationTime = now;
-//             }
-//         }
+/*
+Permanently removes a message from the queue.
+This method is usually used to remove the message after successful processing.
+ *
+- message   a message to remove.
+- callback  (optional) callback function that receives an error or null for success.
+*/
+func (c *MemoryMessageQueue) Complete(message *MessageEnvelope) (err error) {
 
-//         this._logger.trace(message.correlation_id, "Renewed lock for message %s at %s", message, this.toString());
+	reference := message.GetReference()
+	if reference == nil {
+		return nil
+	}
 
-//         if (callback) callback(null);
-//     } catch (ex) {
-//         if (callback) callback(ex);
-//         else throw ex;
-//     }
-// }
+	lockKey, ok := reference.(int)
+	if !ok {
+		return nil
+	}
+	delete(c.lockedMessages, lockKey)
+	message.SetReference(nil)
+	c.Logger.Trace(message.Correlation_id, "Completed message %s at %s", message, c.ToString())
+	return nil
+}
 
-// /**
-//  * Permanently removes a message from the queue.
-//  * This method is usually used to remove the message after successful processing.
-//  *
-//  * @param message   a message to remove.
-//  * @param callback  (optional) callback function that receives an error or null for success.
-//  */
-// public complete(message: MessageEnvelope, callback: (err: any) => void): void {
-//     if (message.getReference() == null) {
-//         if (callback) callback(null);
-//         return;
-//     }
+/*
+Returnes message into the queue and makes it available for all subscribers to receive it again.
+This method is usually used to return a message which could not be processed at the moment
+to repeat the attempt. Messages that cause unrecoverable errors shall be removed permanently
+or/and send to dead letter queue.
+ *
+- message   a message to return.
+- callback  (optional) callback function that receives an error or null for success.
+*/
+func (c *MemoryMessageQueue) Abandon(message *MessageEnvelope) (err error) {
 
-//     try {
-//         let lockKey: number = message.getReference();
-//         delete this.lockedMessages[lockKey];
-//         message.setReference(null);
+	reference := message.GetReference()
+	if reference == nil {
+		return nil
+	}
 
-//         this._logger.trace(message.correlation_id, "Completed message %s at %s", message, this.toString());
+	// Get message from locked queue
+	lockedToken, ok := reference.(int)
+	if !ok {
+		return nil
+	}
+	lockedMessage, ok := c.lockedMessages[lockedToken]
+	if ok {
+		// Remove from locked messages
+		delete(c.lockedMessages, lockedToken)
+		message.SetReference(nil)
+		// Skip if it is already expired
+		if lockedMessage.ExpirationTime.Unix() <= time.Now().Unix() {
+			return nil
+		}
+	} else { // Skip if it absent
+		return nil
+	}
+	c.Logger.Trace(message.Correlation_id, "Abandoned message %s at %s", message, c.ToString())
+	return c.Send(message.Correlation_id, message)
+}
 
-//         if (callback) callback(null);
-//     } catch (ex) {
-//         if (callback) callback(ex);
-//         else throw ex;
-//     }
-// }
+/*
+Permanently removes a message from the queue and sends it to dead letter queue.
+ *
+- message   a message to be removed.
+- callback  (optional) callback function that receives an error or null for success.
+*/
+func (c *MemoryMessageQueue) MoveToDeadLetter(message *MessageEnvelope) (err error) {
+	reference := message.GetReference()
+	if reference == nil {
+		return nil
+	}
 
-// /**
-//  * Returnes message into the queue and makes it available for all subscribers to receive it again.
-//  * This method is usually used to return a message which could not be processed at the moment
-//  * to repeat the attempt. Messages that cause unrecoverable errors shall be removed permanently
-//  * or/and send to dead letter queue.
-//  *
-//  * @param message   a message to return.
-//  * @param callback  (optional) callback function that receives an error or null for success.
-//  */
-// public abandon(message: MessageEnvelope, callback: (err: any) => void): void {
-//     if (message.getReference() == null) {
-//         if (callback) callback(null);
-//         return;
-//     }
+	lockedToken, ok := reference.(int)
+	if !ok {
+		return nil
+	}
 
-//     try {
-//         // Get message from locked queue
-//         let lockedToken: number = message.getReference();
-//         let lockedMessage: LockedMessage = this.lockedMessages[lockedToken];
-//         if (lockedMessage) {
-//             // Remove from locked messages
-//             delete this.lockedMessages[lockedToken];
-//             message.setReference(null);
+	delete(c.lockedMessages, lockedToken)
+	message.SetReference(nil)
+	c.Counters.IncrementOne("queue." + c.GetName() + ".deadmessages")
+	c.Logger.Trace(message.Correlation_id, "Moved to dead message %s at %s", message, c.ToString())
+	return nil
+}
 
-//             // Skip if it is already expired
-//             if (lockedMessage.expirationTime <= new Date()) {
-//                 callback(null);
-//                 return;
-//             }
-//         }
-//         // Skip if it absent
-//         else {
-//             if (callback) callback(null);
-//             return;
-//         }
+/*
+Listens for incoming messages and blocks the current thread until queue is closed.
+ *
+- correlationId     (optional) transaction id to trace execution through call chain.
+- receiver          a receiver to receive incoming messages.
+ *
+See IMessageReceiver
+See receive
+*/
+func (c *MemoryMessageQueue) Listen(correlationId string, receiver IMessageReceiver) {
 
-//         this._logger.trace(message.correlation_id, "Abandoned message %s at %s", message, this.toString());
+	var timeoutInterval time.Duration = 1000 * time.Millisecond
+	c.Logger.Trace("", "Started listening messages at %s", c.ToString())
+	c.cancel = false
 
-//         if (callback) callback(null);
-//     } catch (ex) {
-//         if (callback) callback(ex);
-//         else throw ex;
-//     }
+	go func() {
+		for !c.cancel {
 
-//     this.send(message.correlation_id, message, null);
-// }
+			var message *MessageEnvelope
 
-// /**
-//  * Permanently removes a message from the queue and sends it to dead letter queue.
-//  *
-//  * @param message   a message to be removed.
-//  * @param callback  (optional) callback function that receives an error or null for success.
-//  */
-// public moveToDeadLetter(message: MessageEnvelope, callback: (err: any) => void): void {
-//     if (message.getReference() == null) {
-//         if (callback) callback(null);
-//         return;
-//     }
+			wg := sync.WaitGroup{}
+			wg.Add(1)
+			go func() {
+				result, err := c.Receive(correlationId, timeoutInterval)
+				message = result
+				if err != nil {
+					c.Logger.Error(correlationId, err, "Failed to receive the message")
+				}
+				wg.Done()
+			}()
+			wg.Wait()
+			wg.Add(1)
+			go func() {
+				if message != nil && !c.cancel {
+					err := receiver.ReceiveMessage(message, c)
+					if err != nil {
+						c.Logger.Error(correlationId, err, "Failed to process the message")
+					}
+					wg.Done()
+				}
+			}()
+			wg.Wait()
+			select {
+			case <-time.After(timeoutInterval):
+			}
+		}
 
-//     try {
-//         let lockedToken: number = message.getReference();
-//         delete this.lockedMessages[lockedToken];
-//         message.setReference(null);
+	}()
+}
 
-//         this._counters.incrementOne("queue." + this.getName() + ".deadmessages");
-//         this._logger.trace(message.correlation_id, "Moved to dead message %s at %s", message, this.toString());
-
-//         if (callback) callback(null);
-//     } catch (ex) {
-//         if (callback) callback(ex);
-//         else throw ex;
-//     }
-// }
-
-// /**
-//  * Listens for incoming messages and blocks the current thread until queue is closed.
-//  *
-//  * @param correlationId     (optional) transaction id to trace execution through call chain.
-//  * @param receiver          a receiver to receive incoming messages.
-//  *
-//  * @see [[IMessageReceiver]]
-//  * @see [[receive]]
-//  */
-// public listen(correlationId: string, receiver: IMessageReceiver): void {
-//     let timeoutInterval = 1000;
-
-//     this._logger.trace(null, "Started listening messages at %s", this.toString());
-
-//     this.cancel = false;
-
-//     async.whilst(
-//         () => {
-//             return !this.cancel;
-//         },
-//         (whilstCallback) => {
-//             let message: MessageEnvelope;
-
-//             async.series([
-//                 (callback) => {
-//                     this.receive(correlationId, timeoutInterval, (err, result) => {
-//                         message = result;
-//                         if (err) this._logger.error(correlationId, err, "Failed to receive the message");
-//                         callback();
-//                     })
-//                 },
-//                 (callback) => {
-//                     if (message != null && !this.cancel) {
-//                         receiver.receiveMessage(message, this, (err) => {
-//                             if (err) this._logger.error(correlationId, err, "Failed to process the message");
-//                             callback();
-//                         });
-//                     }
-//                 },
-//             ]);
-
-//             async.series([
-//                 (callback) => {
-//                     setTimeout(callback, timeoutInterval);
-//                 }
-//             ], whilstCallback);
-//         },
-//         (err) => {
-//             if (err) this._logger.error(correlationId, err, "Failed to process the message");
-//         }
-//     );
-// }
-
-// /**
-//  * Ends listening for incoming messages.
-//  * When this method is call [[listen]] unblocks the thread and execution continues.
-//  *
-//  * @param correlationId     (optional) transaction id to trace execution through call chain.
-//  */
-// public endListen(correlationId: string): void {
-//     this.cancel = true;
-// }
+/*
+Ends listening for incoming messages.
+When c method is call listen unblocks the thread and execution continues.
+ *
+- correlationId     (optional) transaction id to trace execution through call chain.
+*/
+func (c *MemoryMessageQueue) EndListen(correlationId string) {
+	c.cancel = true
+}

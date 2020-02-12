@@ -29,5 +29,5 @@ type IMessageReceiver interface {
 	 * @see [[MessageEnvelope]]
 	 * @see [[IMessageQueue]]
 	 */
-	ReceiveMessage(envelope MessageEnvelope, queue IMessageQueue) (err error)
+	ReceiveMessage(envelope *MessageEnvelope, queue IMessageQueue) (err error)
 }

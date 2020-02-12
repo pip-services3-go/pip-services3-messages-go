@@ -12,7 +12,7 @@ type LockedMessage struct {
 	/**
 	 * The incoming message.
 	 */
-	Message MessageEnvelope
+	Message *MessageEnvelope
 
 	/**
 	 * The expiration time for the message lock.
