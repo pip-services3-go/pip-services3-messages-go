@@ -199,12 +199,15 @@ func (c *MemoryMessageQueue) Receive(correlationId string, waitTimeout time.Dura
 	var wg = sync.WaitGroup{}
 	wg.Add(1)
 	go func() {
+		localWg := sync.WaitGroup{}
 
 		for i < waitTimeout && !messageReceived {
 			i = i + checkIntervalMs
 
+			localWg.Add(1)
 			time.AfterFunc(checkIntervalMs, func() {
 				if len(c.messages) == 0 {
+					localWg.Done()
 					return
 				}
 				// Get message from the queue
@@ -231,12 +234,15 @@ func (c *MemoryMessageQueue) Receive(correlationId string, waitTimeout time.Dura
 					lockedMessage.Timeout = waitTimeout
 					c.lockedMessages[lockedToken] = &lockedMessage
 
+					messageReceived = true
+
 					c.Counters.IncrementOne("queue." + c.GetName() + ".receivedmessages")
 					c.Logger.Debug(message.Correlation_id, "Received message %s via %s", message, c.ToString())
 				}
-
-				messageReceived = true
+				localWg.Done()
 			})
+
+			localWg.Wait()
 		}
 
 		wg.Done()

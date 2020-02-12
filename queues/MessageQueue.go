@@ -123,7 +123,7 @@ func (c *MessageQueue) Open(correlationId string) (err error) {
 	wg := sync.WaitGroup{}
 	var conErr, credErr error
 
-	wg.Add(1)
+	wg.Add(2)
 	go func() {
 		result, err := c.ConnectionResolver.Resolve(correlationId)
 		connection = result
