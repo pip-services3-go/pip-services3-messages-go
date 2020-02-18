@@ -204,7 +204,8 @@ Before sending the object is converted into JSON string and wrapped in a Message
 See send
 */
 func (c *MessageQueue) SendAsObject(correlationId string, messageType string, message interface{}) (err error) {
-	envelope := NewMessageEnvelope(correlationId, messageType, message)
+	envelope := NewMessageEnvelope(correlationId, messageType, "")
+	envelope.SetMessageAsJson(message)
 	return c.Send(correlationId, envelope)
 }
 
