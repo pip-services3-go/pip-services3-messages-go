@@ -1,5 +1,5 @@
 {
-  "name": "pip-services3-messages-go",
+  "name": "pip-services3-messaging-go",
   "registry": "pip-services",
   "version": "1.0.0",
   "build": null

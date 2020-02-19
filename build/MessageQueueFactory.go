@@ -3,7 +3,7 @@ package build
 import (
 	cref "github.com/pip-services3-go/pip-services3-commons-go/refer"
 	"github.com/pip-services3-go/pip-services3-components-go/build"
-	"github.com/pip-services3-go/pip-services3-messages-go/queues"
+	"github.com/pip-services3-go/pip-services3-messaging-go/queues"
 )
 
 /**

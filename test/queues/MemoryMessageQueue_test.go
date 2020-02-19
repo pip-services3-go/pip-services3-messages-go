@@ -3,7 +3,7 @@ package test_queues
 import (
 	"testing"
 
-	"github.com/pip-services3-go/pip-services3-messages-go/queues"
+	"github.com/pip-services3-go/pip-services3-messaging-go/queues"
 )
 
 func TestMemoryMessageQueue(t *testing.T) {
