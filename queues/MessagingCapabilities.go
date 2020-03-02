@@ -1,9 +1,9 @@
 package queues
 
-/**
- * Data object that contains supported capabilities of a message queue.
- * If certain capability is not supported a queue will throw NotImplemented exception.
- */
+/*
+MessagingCapabilities data object that contains supported capabilities of a message queue.
+If certain capability is not supported a queue will throw NotImplemented exception.
+*/
 type MessagingCapabilities struct {
 	canMessageCount bool
 	canSend         bool
@@ -16,96 +16,66 @@ type MessagingCapabilities struct {
 	canClear        bool
 }
 
-/**
- * Creates a new instance of the capabilities object.
- *
- * @param canMessageCount   true if queue supports reading message count.
- * @param canSend           true if queue is able to send messages.
- * @param canReceive        true if queue is able to receive messages.
- * @param canPeek           true if queue is able to peek messages.
- * @param canPeekBatch      true if queue is able to peek multiple messages in one batch.
- * @param canRenewLock      true if queue is able to renew message lock.
- * @param canAbandon        true if queue is able to abandon messages.
- * @param canDeadLetter     true if queue is able to send messages to dead letter queue.
- * @param canClear          true if queue can be cleared.
- */
-
+// NewMessagingCapabilities method are creates a new instance of the capabilities object.
+// 	- canMessageCount   true if queue supports reading message count.
+// 	- canSend           true if queue is able to send messages.
+// 	- canReceive        true if queue is able to receive messages.
+// 	- canPeek           true if queue is able to peek messages.
+// 	- canPeekBatch      true if queue is able to peek multiple messages in one batch.
+// 	- canRenewLock      true if queue is able to renew message lock.
+// 	- canAbandon        true if queue is able to abandon messages.
+// 	- canDeadLetter     true if queue is able to send messages to dead letter queue.
+// 	- canClear          true if queue can be cleared.
+// Returns *MessagingCapabilities
 func NewMessagingCapabilities(canMessageCount bool, canSend bool, canReceive bool,
 	canPeek bool, canPeekBatch bool, canRenewLock bool, canAbandon bool,
 	canDeadLetter bool, canClear bool) *MessagingCapabilities {
 
-	mc := MessagingCapabilities{}
-	mc.canMessageCount = canMessageCount
-	mc.canSend = canSend
-	mc.canReceive = canReceive
-	mc.canPeek = canPeek
-	mc.canPeekBatch = canPeekBatch
-	mc.canRenewLock = canRenewLock
-	mc.canAbandon = canAbandon
-	mc.canDeadLetter = canDeadLetter
-	mc.canClear = canClear
-	return &mc
+	c := MessagingCapabilities{}
+	c.canMessageCount = canMessageCount
+	c.canSend = canSend
+	c.canReceive = canReceive
+	c.canPeek = canPeek
+	c.canPeekBatch = canPeekBatch
+	c.canRenewLock = canRenewLock
+	c.canAbandon = canAbandon
+	c.canDeadLetter = canDeadLetter
+	c.canClear = canClear
+	return &c
 }
 
-/**
- * Informs if the queue is able to read number of messages.
- *
- * @returns true if queue supports reading message count.
- */
+// CanMessageCount method are informs if the queue is able to read number of messages.
+// Returns: true if queue supports reading message count.
 func (c *MessagingCapabilities) CanMessageCount() bool { return c.canMessageCount }
 
-/**
- * Informs if the queue is able to send messages.
- *
- * @returns true if queue is able to send messages.
- */
+// CanSend method are informs if the queue is able to send messages.
+// Returns: true if queue is able to send messages.
 func (c *MessagingCapabilities) CanSend() bool { return c.canSend }
 
-/**
- * Informs if the queue is able to receive messages.
- *
- * @returns true if queue is able to receive messages.
- */
+// CanReceive method are informs if the queue is able to receive messages.
+// Returns: true if queue is able to receive messages.
 func (c *MessagingCapabilities) CanReceive() bool { return c.canReceive }
 
-/**
- * Informs if the queue is able to peek messages.
- *
- * @returns true if queue is able to peek messages.
- */
+// CanPeek method are informs if the queue is able to peek messages.
+// Returns: true if queue is able to peek messages.
 func (c *MessagingCapabilities) CanPeek() bool { return c.canPeek }
 
-/**
- * Informs if the queue is able to peek multiple messages in one batch.
- *
- * @returns true if queue is able to peek multiple messages in one batch.
- */
+// CanPeekBatch method are informs if the queue is able to peek multiple messages in one batch.
+// Returns: true if queue is able to peek multiple messages in one batch.
 func (c *MessagingCapabilities) CanPeekBatch() bool { return c.canPeekBatch }
 
-/**
- * Informs if the queue is able to renew message lock.
- *
- * @returns true if queue is able to renew message lock.
- */
+// CanRenewLock method are informs if the queue is able to renew message lock.
+// Returns: true if queue is able to renew message lock.
 func (c *MessagingCapabilities) CanRenewLock() bool { return c.canRenewLock }
 
-/**
- * Informs if the queue is able to abandon messages.
- *
- * @returns true if queue is able to abandon.
- */
+// CanAbandon method are informs if the queue is able to abandon messages.
+// Returns: true if queue is able to abandon.
 func (c *MessagingCapabilities) CanAbandon() bool { return c.canAbandon }
 
-/**
- * Informs if the queue is able to send messages to dead letter queue.
- *
- * @returns true if queue is able to send messages to dead letter queue.
- */
+// CanDeadLetter method are informs if the queue is able to send messages to dead letter queue.
+// Returns: true if queue is able to send messages to dead letter queue.
 func (c *MessagingCapabilities) CanDeadLetter() bool { return c.canDeadLetter }
 
-/**
- * Informs if the queue can be cleared.
- *
- * @returns true if queue can be cleared.
- */
+// CanClear method are informs if the queue can be cleared.
+// Returns: true if queue can be cleared.
 func (c *MessagingCapabilities) CanClear() bool { return c.canClear }

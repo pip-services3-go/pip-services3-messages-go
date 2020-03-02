@@ -6,31 +6,27 @@ import (
 	"github.com/pip-services3-go/pip-services3-messaging-go/queues"
 )
 
-/**
- * Creates [[MemoryMessageQueue]] components by their descriptors.
- * Name of created message queue is taken from its descriptor.
- *
- * @see [[https://rawgit.com/pip-services-node/pip-services3-components-node/master/doc/api/classes/build.factory.html Factory]]
- * @see [[MemoryMessageQueue]]
- */
+/*
+DefaultMessagingFactory Creates MemoryMessageQueue components by their descriptors.
+Name of created message queue is taken from its descriptor.
+See Factory
+See MemoryMessageQueue
+*/
 type DefaultMessagingFactory struct {
 	cbuild.Factory
 	Descriptor            *cref.Descriptor
 	MemoryQueueDescriptor *cref.Descriptor
 }
 
-/**
- * Create a new instance of the factory.
- */
+// NewDefaultMessagingFactory are create a new instance of the factory.
 func NewDefaultMessagingFactory() *DefaultMessagingFactory {
-	//super();
-	dmf := DefaultMessagingFactory{}
-	dmf.Factory = *cbuild.NewFactory()
-	dmf.Descriptor = cref.NewDescriptor("pip-services", "factory", "messaging", "default", "1.0")
-	dmf.MemoryQueueDescriptor = cref.NewDescriptor("pip-services", "message-queue", "memory", "*", "1.0")
+	c := DefaultMessagingFactory{}
+	c.Factory = *cbuild.NewFactory()
+	c.Descriptor = cref.NewDescriptor("pip-services", "factory", "messaging", "default", "1.0")
+	c.MemoryQueueDescriptor = cref.NewDescriptor("pip-services", "message-queue", "memory", "*", "1.0")
 
-	dmf.Register(dmf.MemoryQueueDescriptor, func() interface{} {
-		return queues.NewMemoryMessageQueue(dmf.MemoryQueueDescriptor.Name())
+	c.Register(c.MemoryQueueDescriptor, func() interface{} {
+		return queues.NewMemoryMessageQueue(c.MemoryQueueDescriptor.Name())
 	})
-	return &dmf
+	return &c
 }

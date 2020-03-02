@@ -9,15 +9,13 @@ import (
 )
 
 /*
-Message queue that sends and receives messages within the same process by using shared memory.
-
+MemoryMessageQueue Message queue that sends and receives messages within the same process by using shared memory.
 This queue is typically used for testing to mock real queues.
-
- Configuration parameters
+Configuration parameters:
 
 - name:                        name of the message queue
 
- References
+References:
 
 - *:logger:*:*:1.0           (optional)  ILogger components to pass log messages
 - *:counters:*:*:1.0         (optional)  ICounters components to pass collected measurements
@@ -25,18 +23,16 @@ This queue is typically used for testing to mock real queues.
 See MessageQueue
 See MessagingCapabilities
 
- Example
+Example:
 
-    let queue = new MessageQueue("myqueue");
-
-    queue.send("123", new MessageEnvelop(null, "mymessage", "ABC"));
-
-    queue.receive("123", (err, message) => {
-        if (message != null) {
+    queue := NewMessageQueue("myqueue");
+    queue.Send("123", NewMessageEnvelop("", "mymessage", "ABC"));
+	message, err := queue.Receive("123")
+        if (message != nil) {
            ...
-           queue.complete("123", message);
+           queue.Complete("123", message);
         }
-    });
+
 */
 type MemoryMessageQueue struct {
 	MessageQueue
@@ -48,56 +44,42 @@ type MemoryMessageQueue struct {
 	cancel bool
 }
 
-/*
-Creates a new instance of the message queue.
-
-- name  (optional) a queue name.
-
-See MessagingCapabilities
-*/
+// NewMemoryMessageQueue method are creates a new instance of the message queue.
+// - name  (optional) a queue name.
+// Returns: *MemoryMessageQueue
+// See MessagingCapabilities
 func NewMemoryMessageQueue(name string) *MemoryMessageQueue {
-	mmq := MemoryMessageQueue{}
-	mmq.MessageQueue = *NewMessageQueue(name)
-
-	mmq.MessageQueue.IMessageQueue = &mmq
-
-	mmq.messages = make([]MessageEnvelope, 0)
-	mmq.lockTokenSequence = 0
-	mmq.lockedMessages = make(map[int]*LockedMessage, 0)
-	mmq.opened = false
-	mmq.cancel = false
-	mmq.Capabilities = NewMessagingCapabilities(true, true, true, true, true, true, true, false, true)
-	return &mmq
+	c := MemoryMessageQueue{}
+	c.MessageQueue = *NewMessageQueue(name)
+	c.MessageQueue.IMessageQueue = &c
+	c.messages = make([]MessageEnvelope, 0)
+	c.lockTokenSequence = 0
+	c.lockedMessages = make(map[int]*LockedMessage, 0)
+	c.opened = false
+	c.cancel = false
+	c.Capabilities = NewMessagingCapabilities(true, true, true, true, true, true, true, false, true)
+	return &c
 }
 
-/*
-Checks if the component is opened.
-
-Return true if the component has been opened and false otherwise.
-*/
+// IsOpen method are checks if the component is opened.
+// Return true if the component has been opened and false otherwise.
 func (c *MemoryMessageQueue) IsOpen() bool {
 	return c.opened
 }
 
-/*
-Opens the component with given connection and credential parameters.
- *
-- correlationId     (optional) transaction id to trace execution through call chain.
-- connection        connection parameters
-- credential        credential parameters
-- callback 			callback function that receives error or null no errors occured.
-*/
+// OpenWithParams method are opens the component with given connection and credential parameters.
+// - correlationId     (optional) transaction id to trace execution through call chain.
+// - connection        connection parameters
+// - credential        credential parameters
+// Retruns: error or nil no errors occured.
 func (c *MemoryMessageQueue) OpenWithParams(correlationId string, connection *ccon.ConnectionParams, credential *auth.CredentialParams) (err error) {
 	c.opened = true
 	return nil
 }
 
-/*
-Closes component and frees used resources.
- *
-- correlationId 	(optional) transaction id to trace execution through call chain.
-- callback 			callback function that receives error or null no errors occured.
-*/
+// Close method are closes component and frees used resources.
+// - correlationId 	(optional) transaction id to trace execution through call chain.
+// Returns: error or nil no errors occured.
 func (c *MemoryMessageQueue) Close(correlationId string) (err error) {
 	c.opened = false
 	c.cancel = true
@@ -105,12 +87,9 @@ func (c *MemoryMessageQueue) Close(correlationId string) (err error) {
 	return nil
 }
 
-/*
-Clears component state.
- *
-- correlationId 	(optional) transaction id to trace execution through call chain.
-- callback 			callback function that receives error or null no errors occured.
-*/
+// Clear method are clears component state.
+// - correlationId 	(optional) transaction id to trace execution through call chain.
+// Returns: error or nil no errors occured.
 func (c *MemoryMessageQueue) Clear(correlationId string) (err error) {
 	c.messages = c.messages[:0]
 	c.lockedMessages = make(map[int]*LockedMessage, 0)
@@ -118,23 +97,17 @@ func (c *MemoryMessageQueue) Clear(correlationId string) (err error) {
 	return nil
 }
 
-/*
-Reads the current number of messages in the queue to be delivered.
- *
-- callback      callback function that receives number of messages or error.
-*/
+// ReadMessageCount method are reads the current number of messages in the queue to be delivered.
+// Returns: number of messages or error.
 func (c *MemoryMessageQueue) ReadMessageCount() (count int64, err error) {
 	count = (int64)(len(c.messages))
 	return count, nil
 }
 
-/*
-Sends a message into the queue.
- *
-- correlationId     (optional) transaction id to trace execution through call chain.
-- envelope          a message envelop to be sent.
-- callback          (optional) callback function that receives error or null for success.
-*/
+// Send method are sends a message into the queue.
+// - correlationId     (optional) transaction id to trace execution through call chain.
+// - envelope          a message envelop to be sent.
+// Returns: error or nil for success.
 func (c *MemoryMessageQueue) Send(correlationId string, envelope *MessageEnvelope) (err error) {
 
 	envelope.Sent_time = time.Now()
@@ -145,13 +118,10 @@ func (c *MemoryMessageQueue) Send(correlationId string, envelope *MessageEnvelop
 	return nil
 }
 
-/*
-Peeks a single incoming message from the queue without removing it.
-If there are no messages available in the queue it returns null.
- *
-- correlationId     (optional) transaction id to trace execution through call chain.
-- callback          callback function that receives a message or error.
-*/
+// Peek meethod are peeks a single incoming message from the queue without removing it.
+// If there are no messages available in the queue it returns nil.
+// - correlationId     (optional) transaction id to trace execution through call chain.
+// Returns: a message or error.
 func (c *MemoryMessageQueue) Peek(correlationId string) (result *MessageEnvelope, err error) {
 	var message MessageEnvelope
 	// Pick a message
@@ -163,14 +133,11 @@ func (c *MemoryMessageQueue) Peek(correlationId string) (result *MessageEnvelope
 	return nil, nil
 }
 
-/*
-Peeks multiple incoming messages from the queue without removing them.
-If there are no messages available in the queue it returns an empty list.
- *
-- correlationId     (optional) transaction id to trace execution through call chain.
-- messageCount      a maximum number of messages to peek.
-- callback          callback function that receives a list with messages or error.
-*/
+// PeekBatch method are peeks multiple incoming messages from the queue without removing them.
+// If there are no messages available in the queue it returns an empty list.
+// - correlationId     (optional) transaction id to trace execution through call chain.
+// - messageCount      a maximum number of messages to peek.
+// Returns: a list with messages or error.
 func (c *MemoryMessageQueue) PeekBatch(correlationId string, messageCount int64) (result []MessageEnvelope, err error) {
 
 	var messages []MessageEnvelope = make([]MessageEnvelope, 0, 0)
@@ -181,13 +148,10 @@ func (c *MemoryMessageQueue) PeekBatch(correlationId string, messageCount int64)
 	return messages, nil
 }
 
-/*
-Receives an incoming message and removes it from the queue.
- *
-- correlationId     (optional) transaction id to trace execution through call chain.
-- waitTimeout       a timeout in milliseconds to wait for a message to come.
-- callback          callback function that receives a message or error.
-*/
+//  Receive method are receives an incoming message and removes it from the queue.
+// - correlationId     (optional) transaction id to trace execution through call chain.
+// - waitTimeout       a timeout in milliseconds to wait for a message to come.
+// Returns: a message or error.
 func (c *MemoryMessageQueue) Receive(correlationId string, waitTimeout time.Duration) (result *MessageEnvelope, err error) {
 	err = nil
 	var message *MessageEnvelope
@@ -253,14 +217,11 @@ func (c *MemoryMessageQueue) Receive(correlationId string, waitTimeout time.Dura
 	return message, err
 }
 
-/*
-Renews a lock on a message that makes it invisible from other receivers in the queue.
-This method is usually used to extend the message processing time.
- *
-- message       a message to extend its lock.
-- lockTimeout   a locking timeout in milliseconds.
-- callback      (optional) callback function that receives an error or null for success.
-*/
+// RenewLock method are renews a lock on a message that makes it invisible from other receivers in the queue.
+// This method is usually used to extend the message processing time.
+// - message       a message to extend its lock.
+// - lockTimeout   a locking timeout in milliseconds.
+// Returns:  error or nil for success.
 func (c *MemoryMessageQueue) RenewLock(message *MessageEnvelope, lockTimeout time.Duration) (err error) {
 
 	reference := message.GetReference()
@@ -287,13 +248,10 @@ func (c *MemoryMessageQueue) RenewLock(message *MessageEnvelope, lockTimeout tim
 	return nil
 }
 
-/*
-Permanently removes a message from the queue.
-This method is usually used to remove the message after successful processing.
- *
-- message   a message to remove.
-- callback  (optional) callback function that receives an error or null for success.
-*/
+// Complete method are permanently removes a message from the queue.
+// This method is usually used to remove the message after successful processing.
+// - message   a message to remove.
+// Returns: error or nil for success.
 func (c *MemoryMessageQueue) Complete(message *MessageEnvelope) (err error) {
 
 	reference := message.GetReference()
@@ -311,15 +269,12 @@ func (c *MemoryMessageQueue) Complete(message *MessageEnvelope) (err error) {
 	return nil
 }
 
-/*
-Returnes message into the queue and makes it available for all subscribers to receive it again.
-This method is usually used to return a message which could not be processed at the moment
-to repeat the attempt. Messages that cause unrecoverable errors shall be removed permanently
-or/and send to dead letter queue.
- *
-- message   a message to return.
-- callback  (optional) callback function that receives an error or null for success.
-*/
+// Abandon method are returnes message into the queue and makes it available for all subscribers to receive it again.
+// This method is usually used to return a message which could not be processed at the moment
+// to repeat the attempt. Messages that cause unrecoverable errors shall be removed permanently
+// or/and send to dead letter queue.
+// - message   a message to return.
+// Returns: error or nil for success.
 func (c *MemoryMessageQueue) Abandon(message *MessageEnvelope) (err error) {
 
 	reference := message.GetReference()
@@ -348,12 +303,9 @@ func (c *MemoryMessageQueue) Abandon(message *MessageEnvelope) (err error) {
 	return c.Send(message.Correlation_id, message)
 }
 
-/*
-Permanently removes a message from the queue and sends it to dead letter queue.
- *
-- message   a message to be removed.
-- callback  (optional) callback function that receives an error or null for success.
-*/
+// MoveToDeadLetter method are permanently removes a message from the queue and sends it to dead letter queue.
+// - message   a message to be removed.
+// Returns: error or nil for success.
 func (c *MemoryMessageQueue) MoveToDeadLetter(message *MessageEnvelope) (err error) {
 	reference := message.GetReference()
 	if reference == nil {
@@ -372,15 +324,11 @@ func (c *MemoryMessageQueue) MoveToDeadLetter(message *MessageEnvelope) (err err
 	return nil
 }
 
-/*
-Listens for incoming messages and blocks the current thread until queue is closed.
- *
-- correlationId     (optional) transaction id to trace execution through call chain.
-- receiver          a receiver to receive incoming messages.
- *
-See IMessageReceiver
-See receive
-*/
+// Listen method are listens for incoming messages and blocks the current thread until queue is closed.
+// - correlationId     (optional) transaction id to trace execution through call chain.
+// - receiver          a receiver to receive incoming messages.
+// See IMessageReceiver
+// See Receive
 func (c *MemoryMessageQueue) Listen(correlationId string, receiver IMessageReceiver) {
 
 	var timeoutInterval time.Duration = 1000 * time.Millisecond
@@ -422,12 +370,9 @@ func (c *MemoryMessageQueue) Listen(correlationId string, receiver IMessageRecei
 	}()
 }
 
-/*
-Ends listening for incoming messages.
-When c method is call listen unblocks the thread and execution continues.
- *
-- correlationId     (optional) transaction id to trace execution through call chain.
-*/
+// EndListen method are ends listening for incoming messages.
+// When c method is call listen unblocks the thread and execution continues.
+// - correlationId     (optional) transaction id to trace execution through call chain.
 func (c *MemoryMessageQueue) EndListen(correlationId string) {
 	c.cancel = true
 }

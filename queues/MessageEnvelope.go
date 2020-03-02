@@ -7,37 +7,33 @@ import (
 	cdata "github.com/pip-services3-go/pip-services3-commons-go/data"
 )
 
-//TODO: UTF-8 important?
 /*
-Allows adding additional information to messages. A correlation id, message id, and a message type
+MessageEnvelope allows adding additional information to messages. A correlation id, message id, and a message type
 are added to the data being sent/received. Additionally, a MessageEnvelope can reference a lock token.
- *
 Side note: a MessageEnvelope"s message is stored as a buffer, so strings are converted
 using utf8 conversions.
 */
 type MessageEnvelope struct {
 	reference interface{}
 
-	/* The unique business transaction id that is used to trace calls across components. */
+	//The unique business transaction id that is used to trace calls across components.
 	Correlation_id string
-	/* The message"s auto-generated ID. */
+	// The message"s auto-generated ID.
 	Message_id string
-	/* String value that defines the stored message"s type. */
+	// String value that defines the stored message"s type.
 	Message_type string
-	/* The time at which the message was sent. */
+	// The time at which the message was sent.
 	Sent_time time.Time
-	/* The stored message. */
+	//The stored message.
 	Message string
 }
 
-/*
-Creates a new MessageEnvelope, which adds a correlation id, message id, and a type to the
-data being sent/received.
-
-- correlationId     (optional) transaction id to trace execution through call chain.
-- messageType       a string value that defines the message"s type.
-- message           the data being sent/received.
-*/
+// NewMessageEnvelope method are creates a new MessageEnvelope, which adds a correlation id, message id, and a type to the
+// data being sent/received.
+// - correlationId     (optional) transaction id to trace execution through call chain.
+// - messageType       a string value that defines the message"s type.
+// - message           the data being sent/received.
+// Returns: *MessageEnvelope new instance
 func NewMessageEnvelope(correlationId string, messageType string, message string) *MessageEnvelope {
 	me := MessageEnvelope{}
 	me.Correlation_id = correlationId
@@ -47,43 +43,30 @@ func NewMessageEnvelope(correlationId string, messageType string, message string
 	return &me
 }
 
-/*
-Returns the lock token that c MessageEnvelope references.
-*/
+//GetReference method are returns the lock token that this MessageEnvelope references.
 func (c *MessageEnvelope) GetReference() interface{} {
 	return c.reference
 }
 
-/*
-Sets a lock token reference for c MessageEnvelope.
-- value     the lock token to reference.
-*/
+// SetReference method are sets a lock token reference for this MessageEnvelope.
+// - value     the lock token to reference.
 func (c *MessageEnvelope) SetReference(value interface{}) {
 	c.reference = value
 }
 
-/*
-Returns the information stored in c message as a UTF-8 encoded string.
-*/
+// GetMessageAsString method are returns the information stored in this message as a string.
 func (c *MessageEnvelope) GetMessageAsString() string {
 	return c.Message
 }
 
-/*
-Stores the given string.
-
-- value     the string to set. Will be converted to
-                 a buffer, using UTF-8 encoding.
-*/
+// SetMessageAsString method are stores the given string.
+// - value    the string to set. Will be converted to a bufferg.
 func (c *MessageEnvelope) SetMessageAsString(value string) {
 	c.Message = value
 }
 
-/*
-Returns the value that was stored in c message
-         as a JSON string.
-See  setMessageAsJson
-*/
+// GetMessageAsJson method are returns the value that was stored in this message as a JSON string.
+// See  SetMessageAsJson
 func (c *MessageEnvelope) GetMessageAsJson() interface{} {
 	if c.Message == "" {
 		return nil
@@ -97,14 +80,9 @@ func (c *MessageEnvelope) GetMessageAsJson() interface{} {
 	return result
 }
 
-/*
-Stores the given value as a JSON string.
- *
-- value     the value to convert to JSON and store in
-                 c message.
- *
-See  getMessageAsJson
-*/
+// SetMessageAsJson method are stores the given value as a JSON string.
+// - value     the value to convert to JSON and store in this message.
+// See  GetMessageAsJson
 func (c *MessageEnvelope) SetMessageAsJson(value interface{}) {
 	if value == nil {
 		c.Message = ""
@@ -116,15 +94,10 @@ func (c *MessageEnvelope) SetMessageAsJson(value interface{}) {
 	}
 }
 
-/*
-Convert"s c MessageEnvelope to a string, using the following format:
- *
-<code>"[<correlation_id>,<Message_type>,<message.toString>]"</code>.
- *
-If any of the values are <code>nil</code>, they will be replaced with <code>---</code>.
- *
-Returns the generated string.
-*/
+// ToString method are convert"s this MessageEnvelope to a string, using the following format:
+// <correlation_id>,<Message_type>,<message.toString>
+// If any of the values are nil, they will be replaced with ---.
+// Returns the generated string.
 func (c *MessageEnvelope) ToString() string {
 	builder := "["
 	if c.Correlation_id == "" {
