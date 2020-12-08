@@ -1,20 +1,54 @@
-# <img src="https://github.com/pip-services/pip-services/raw/master/design/Logo.png" alt="Pip.Services Logo" style="max-width:30%"> <br/> Pip.Services Asynchronous Messaging for Golang
+# <img src="https://uploads-ssl.webflow.com/5ea5d3315186cf5ec60c3ee4/5edf1c94ce4c859f2b188094_logo.svg" alt="Pip.Services Logo" width="200"> <br/> IoC container for Golang
 
-This framework is a part of the [Pip.Services](https://github.com/pip-services/pip-services) project.
-It contains asynchronous communication components:
+This module is a part of the [Pip.Services](http://pipservices.org) polyglot microservices toolkit.
 
-- [MessageQueue]()
-- [MemoryMessageQueue]()
-- [MemoryMessageQueueFactory]()
+The Messaging module contains a set of interfaces and classes for working with message queues, as well as an in-memory message queue implementation. 
 
-Quick Links:
+The module contains the following packages:
 
-* [Downloads](https://github.com/pip-services3-go/pip-services3-messaging-go/blob/master/docs/Downloads.md)
+- [**Build**](https://godoc.org/github.com/pip-services3-go/pip-services3-messaging-go/build) - in-memory message queue factory
+- [**Queues**](https://godoc.org/github.com/pip-services3-go/pip-services3-messaging-go/queues) - contains interfaces for working with message queues, subscriptions for receiving messages from the queue, and an in-memory message queue implementation.
+
+<a name="links"></a> Quick links:
+
+* [Configuration](https://www.pipservices.org/recipies/configuration)
 * [API Reference](https://godoc.org/github.com/pip-services3-go/pip-services3-messaging-go/)
-* [Building and Testing](https://github.com/pip-services3-go/pip-services3-messaging-go/blob/master/docs/Development.md)
-* [Contributing](https://github.com/pip-services3-go/pip-services3-messaging-go/blob/master/docs/Development.md#contrib)
+* [Change Log](CHANGELOG.md)
+* [Get Help](https://www.pipservices.org/community/help)
+* [Contribute](https://www.pipservices.org/community/contribute)
 
-## Acknowledgements
+## Use
+
+Get the package from the Github repository:
+```bash
+go get -u github.com/pip-services3-go/pip-services3-messaging-go@latest
+```
+
+## Develop
+
+For development you shall install the following prerequisites:
+* Golang v1.12+
+* Visual Studio Code or another IDE of your choice
+* Docker
+* Git
+
+Run automated tests:
+```bash
+go test -v ./test/...
+```
+
+Generate API documentation:
+```bash
+./docgen.ps1
+```
+
+Before committing changes run dockerized test as:
+```bash
+./test.ps1
+./clear.ps1
+```
+
+## Contacts
 
 The Golang version of Pip.Services is created and maintained by:
 - **Levichev Dmitry**
