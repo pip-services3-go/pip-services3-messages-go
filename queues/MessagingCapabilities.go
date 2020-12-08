@@ -17,15 +17,15 @@ type MessagingCapabilities struct {
 }
 
 // NewMessagingCapabilities method are creates a new instance of the capabilities object.
-// 	- canMessageCount   true if queue supports reading message count.
-// 	- canSend           true if queue is able to send messages.
-// 	- canReceive        true if queue is able to receive messages.
-// 	- canPeek           true if queue is able to peek messages.
-// 	- canPeekBatch      true if queue is able to peek multiple messages in one batch.
-// 	- canRenewLock      true if queue is able to renew message lock.
-// 	- canAbandon        true if queue is able to abandon messages.
-// 	- canDeadLetter     true if queue is able to send messages to dead letter queue.
-// 	- canClear          true if queue can be cleared.
+//   - canMessageCount   true if queue supports reading message count.
+//   - canSend           true if queue is able to send messages.
+//   - canReceive        true if queue is able to receive messages.
+//   - canPeek           true if queue is able to peek messages.
+//   - canPeekBatch      true if queue is able to peek multiple messages in one batch.
+//   - canRenewLock      true if queue is able to renew message lock.
+//   - canAbandon        true if queue is able to abandon messages.
+//   - canDeadLetter     true if queue is able to send messages to dead letter queue.
+//   - canClear          true if queue can be cleared.
 // Returns *MessagingCapabilities
 func NewMessagingCapabilities(canMessageCount bool, canSend bool, canReceive bool,
 	canPeek bool, canPeekBatch bool, canRenewLock bool, canAbandon bool,

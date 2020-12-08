@@ -16,19 +16,19 @@ MessageQueue message queue that is used as a basis for specific message queue im
 
 Configuration parameters:
 
-- name:                        name of the message queue
-- connection(s):
-  - discovery_key:             key to retrieve parameters from discovery service
-  - protocol:                  connection protocol like http, https, tcp, udp
-  - host:                      host name or IP address
-  - port:                      port number
-  - uri:                       resource URI or connection string with all parameters in it
-- credential(s):
-  - store_key:                 key to retrieve parameters from credential store
-  - username:                  user name
-  - password:                  user password
-  - access_id:                 application access id
-  - access_key:                application secret key
+  - name:                        name of the message queue
+  - connection(s):
+    - discovery_key:             key to retrieve parameters from discovery service
+    - protocol:                  connection protocol like http, https, tcp, udp
+    - host:                      host name or IP address
+    - port:                      port number
+    - uri:                       resource URI or connection string with all parameters in it
+  - credential(s):
+    - store_key:                 key to retrieve parameters from credential store
+    - username:                  user name
+    - password:                  user password
+    - access_id:                 application access id
+    - access_key:                application secret key
 
 References:
 
@@ -48,7 +48,7 @@ type MessageQueue struct {
 }
 
 // NewMessageQueue method are creates a new instance of the message queue.
-// - name  (optional) a queue name
+//   - name  (optional) a queue name
 func NewMessageQueue(name string) *MessageQueue {
 	c := MessageQueue{Name: name}
 	c.Logger = clog.NewCompositeLogger()
@@ -67,7 +67,7 @@ func (c *MessageQueue) GetName() string { return c.Name }
 func (c *MessageQueue) GetCapabilities() MessagingCapabilities { return *c.Capabilities }
 
 // Configure method are configures component by passing configuration parameters.
-// - config    configuration parameters to be set.
+//   - config    configuration parameters to be set.
 func (c *MessageQueue) Configure(config *cconf.ConfigParams) {
 	c.Name = cconf.NameResolver.ResolveWithDefault(config, c.Name)
 	c.Logger.Configure(config)
@@ -76,7 +76,7 @@ func (c *MessageQueue) Configure(config *cconf.ConfigParams) {
 }
 
 // SetReferences mmethod are sets references to dependent components.
-// - references 	references to locate the component dependencies.
+//   - references 	references to locate the component dependencies.
 func (c *MessageQueue) SetReferences(references cref.IReferences) {
 	c.Logger.SetReferences(references)
 	c.Counters.SetReferences(references)
@@ -85,7 +85,7 @@ func (c *MessageQueue) SetReferences(references cref.IReferences) {
 }
 
 // Open method are opens the component.
-// - correlationId 	(optional) transaction id to trace execution through call chain.
+//   - correlationId 	(optional) transaction id to trace execution through call chain.
 // Returns: error or null no errors occured.
 func (c *MessageQueue) Open(correlationId string) (err error) {
 	var connection *ccon.ConnectionParams
@@ -121,9 +121,9 @@ func (c *MessageQueue) Open(correlationId string) (err error) {
 
 // SendAsObject method are sends an object into the queue.
 // Before sending the object is converted into JSON string and wrapped in a MessageEnvelop.
-// - correlationId     (optional) transaction id to trace execution through call chain.
-// - messageType       a message type
-// - value             an object value to be sent
+//   - correlationId     (optional) transaction id to trace execution through call chain.
+//   - messageType       a message type
+//   - value             an object value to be sent
 // Returns: error or null for success.
 // See Send
 func (c *MessageQueue) SendAsObject(correlationId string, messageType string, message interface{}) (err error) {
@@ -133,8 +133,8 @@ func (c *MessageQueue) SendAsObject(correlationId string, messageType string, me
 }
 
 // BeginListen method are listens for incoming messages without blocking the current thread.
-// - correlationId     (optional) transaction id to trace execution through call chain.
-// - receiver          a receiver to receive incoming messages.
+//   - correlationId     (optional) transaction id to trace execution through call chain.
+//   - receiver          a receiver to receive incoming messages.
 // See Listen
 // See IMessageReceiver
 func (c *MessageQueue) BeginListen(correlationId string, receiver IMessageReceiver) {

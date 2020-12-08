@@ -30,9 +30,9 @@ type MessageEnvelope struct {
 
 // NewMessageEnvelope method are creates a new MessageEnvelope, which adds a correlation id, message id, and a type to the
 // data being sent/received.
-// - correlationId     (optional) transaction id to trace execution through call chain.
-// - messageType       a string value that defines the message"s type.
-// - message           the data being sent/received.
+//   - correlationId     (optional) transaction id to trace execution through call chain.
+//   - messageType       a string value that defines the message"s type.
+//   - message           the data being sent/received.
 // Returns: *MessageEnvelope new instance
 func NewMessageEnvelope(correlationId string, messageType string, message string) *MessageEnvelope {
 	me := MessageEnvelope{}
@@ -49,7 +49,7 @@ func (c *MessageEnvelope) GetReference() interface{} {
 }
 
 // SetReference method are sets a lock token reference for this MessageEnvelope.
-// - value     the lock token to reference.
+//   - value     the lock token to reference.
 func (c *MessageEnvelope) SetReference(value interface{}) {
 	c.reference = value
 }
@@ -60,7 +60,7 @@ func (c *MessageEnvelope) GetMessageAsString() string {
 }
 
 // SetMessageAsString method are stores the given string.
-// - value    the string to set. Will be converted to a bufferg.
+//   - value    the string to set. Will be converted to a bufferg.
 func (c *MessageEnvelope) SetMessageAsString(value string) {
 	c.Message = value
 }
@@ -81,7 +81,7 @@ func (c *MessageEnvelope) GetMessageAsJson() interface{} {
 }
 
 // SetMessageAsJson method are stores the given value as a JSON string.
-// - value     the value to convert to JSON and store in this message.
+//   - value     the value to convert to JSON and store in this message.
 // See  GetMessageAsJson
 func (c *MessageEnvelope) SetMessageAsJson(value interface{}) {
 	if value == nil {

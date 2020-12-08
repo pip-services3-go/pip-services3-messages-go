@@ -13,7 +13,7 @@ MemoryMessageQueue Message queue that sends and receives messages within the sam
 This queue is typically used for testing to mock real queues.
 Configuration parameters:
 
-- name:                        name of the message queue
+  - name:                        name of the message queue
 
 References:
 
@@ -45,7 +45,7 @@ type MemoryMessageQueue struct {
 }
 
 // NewMemoryMessageQueue method are creates a new instance of the message queue.
-// - name  (optional) a queue name.
+//   - name  (optional) a queue name.
 // Returns: *MemoryMessageQueue
 // See MessagingCapabilities
 func NewMemoryMessageQueue(name string) *MemoryMessageQueue {
@@ -68,9 +68,9 @@ func (c *MemoryMessageQueue) IsOpen() bool {
 }
 
 // OpenWithParams method are opens the component with given connection and credential parameters.
-// - correlationId     (optional) transaction id to trace execution through call chain.
-// - connection        connection parameters
-// - credential        credential parameters
+//   - correlationId     (optional) transaction id to trace execution through call chain.
+//   - connection        connection parameters
+//   - credential        credential parameters
 // Retruns: error or nil no errors occured.
 func (c *MemoryMessageQueue) OpenWithParams(correlationId string, connection *ccon.ConnectionParams, credential *auth.CredentialParams) (err error) {
 	c.opened = true
@@ -78,7 +78,7 @@ func (c *MemoryMessageQueue) OpenWithParams(correlationId string, connection *cc
 }
 
 // Close method are closes component and frees used resources.
-// - correlationId 	(optional) transaction id to trace execution through call chain.
+//   - correlationId 	(optional) transaction id to trace execution through call chain.
 // Returns: error or nil no errors occured.
 func (c *MemoryMessageQueue) Close(correlationId string) (err error) {
 	c.opened = false
@@ -88,7 +88,7 @@ func (c *MemoryMessageQueue) Close(correlationId string) (err error) {
 }
 
 // Clear method are clears component state.
-// - correlationId 	(optional) transaction id to trace execution through call chain.
+//   - correlationId 	(optional) transaction id to trace execution through call chain.
 // Returns: error or nil no errors occured.
 func (c *MemoryMessageQueue) Clear(correlationId string) (err error) {
 	c.messages = c.messages[:0]
@@ -105,8 +105,8 @@ func (c *MemoryMessageQueue) ReadMessageCount() (count int64, err error) {
 }
 
 // Send method are sends a message into the queue.
-// - correlationId     (optional) transaction id to trace execution through call chain.
-// - envelope          a message envelop to be sent.
+//   - correlationId     (optional) transaction id to trace execution through call chain.
+//   - envelope          a message envelop to be sent.
 // Returns: error or nil for success.
 func (c *MemoryMessageQueue) Send(correlationId string, envelope *MessageEnvelope) (err error) {
 
@@ -120,7 +120,7 @@ func (c *MemoryMessageQueue) Send(correlationId string, envelope *MessageEnvelop
 
 // Peek meethod are peeks a single incoming message from the queue without removing it.
 // If there are no messages available in the queue it returns nil.
-// - correlationId     (optional) transaction id to trace execution through call chain.
+//   - correlationId     (optional) transaction id to trace execution through call chain.
 // Returns: a message or error.
 func (c *MemoryMessageQueue) Peek(correlationId string) (result *MessageEnvelope, err error) {
 	var message MessageEnvelope
@@ -135,8 +135,8 @@ func (c *MemoryMessageQueue) Peek(correlationId string) (result *MessageEnvelope
 
 // PeekBatch method are peeks multiple incoming messages from the queue without removing them.
 // If there are no messages available in the queue it returns an empty list.
-// - correlationId     (optional) transaction id to trace execution through call chain.
-// - messageCount      a maximum number of messages to peek.
+//   - correlationId     (optional) transaction id to trace execution through call chain.
+//   - messageCount      a maximum number of messages to peek.
 // Returns: a list with messages or error.
 func (c *MemoryMessageQueue) PeekBatch(correlationId string, messageCount int64) (result []MessageEnvelope, err error) {
 
@@ -149,8 +149,8 @@ func (c *MemoryMessageQueue) PeekBatch(correlationId string, messageCount int64)
 }
 
 //  Receive method are receives an incoming message and removes it from the queue.
-// - correlationId     (optional) transaction id to trace execution through call chain.
-// - waitTimeout       a timeout in milliseconds to wait for a message to come.
+//   - correlationId     (optional) transaction id to trace execution through call chain.
+//   - waitTimeout       a timeout in milliseconds to wait for a message to come.
 // Returns: a message or error.
 func (c *MemoryMessageQueue) Receive(correlationId string, waitTimeout time.Duration) (result *MessageEnvelope, err error) {
 	err = nil
@@ -219,8 +219,8 @@ func (c *MemoryMessageQueue) Receive(correlationId string, waitTimeout time.Dura
 
 // RenewLock method are renews a lock on a message that makes it invisible from other receivers in the queue.
 // This method is usually used to extend the message processing time.
-// - message       a message to extend its lock.
-// - lockTimeout   a locking timeout in milliseconds.
+//   - message       a message to extend its lock.
+//   - lockTimeout   a locking timeout in milliseconds.
 // Returns:  error or nil for success.
 func (c *MemoryMessageQueue) RenewLock(message *MessageEnvelope, lockTimeout time.Duration) (err error) {
 
@@ -250,7 +250,7 @@ func (c *MemoryMessageQueue) RenewLock(message *MessageEnvelope, lockTimeout tim
 
 // Complete method are permanently removes a message from the queue.
 // This method is usually used to remove the message after successful processing.
-// - message   a message to remove.
+//   - message   a message to remove.
 // Returns: error or nil for success.
 func (c *MemoryMessageQueue) Complete(message *MessageEnvelope) (err error) {
 
@@ -273,7 +273,7 @@ func (c *MemoryMessageQueue) Complete(message *MessageEnvelope) (err error) {
 // This method is usually used to return a message which could not be processed at the moment
 // to repeat the attempt. Messages that cause unrecoverable errors shall be removed permanently
 // or/and send to dead letter queue.
-// - message   a message to return.
+//   - message   a message to return.
 // Returns: error or nil for success.
 func (c *MemoryMessageQueue) Abandon(message *MessageEnvelope) (err error) {
 
@@ -304,7 +304,7 @@ func (c *MemoryMessageQueue) Abandon(message *MessageEnvelope) (err error) {
 }
 
 // MoveToDeadLetter method are permanently removes a message from the queue and sends it to dead letter queue.
-// - message   a message to be removed.
+//   - message   a message to be removed.
 // Returns: error or nil for success.
 func (c *MemoryMessageQueue) MoveToDeadLetter(message *MessageEnvelope) (err error) {
 	reference := message.GetReference()
@@ -325,8 +325,8 @@ func (c *MemoryMessageQueue) MoveToDeadLetter(message *MessageEnvelope) (err err
 }
 
 // Listen method are listens for incoming messages and blocks the current thread until queue is closed.
-// - correlationId     (optional) transaction id to trace execution through call chain.
-// - receiver          a receiver to receive incoming messages.
+//   - correlationId     (optional) transaction id to trace execution through call chain.
+//   - receiver          a receiver to receive incoming messages.
 // See IMessageReceiver
 // See Receive
 func (c *MemoryMessageQueue) Listen(correlationId string, receiver IMessageReceiver) {
@@ -372,7 +372,7 @@ func (c *MemoryMessageQueue) Listen(correlationId string, receiver IMessageRecei
 
 // EndListen method are ends listening for incoming messages.
 // When c method is call listen unblocks the thread and execution continues.
-// - correlationId     (optional) transaction id to trace execution through call chain.
+//   - correlationId     (optional) transaction id to trace execution through call chain.
 func (c *MemoryMessageQueue) EndListen(correlationId string) {
 	c.cancel = true
 }

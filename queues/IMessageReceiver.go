@@ -21,9 +21,9 @@ Example:
 type IMessageReceiver interface {
 
 	// ReceiveMessage method are receives incoming message from the queue.
-	// - envelope  an incoming message
-	// - queue     a queue where the message comes from
-	// - callback  callback function that receives error or null for success.
+	//   - envelope  an incoming message
+	//   - queue     a queue where the message comes from
+	//   - callback  callback function that receives error or null for success.
 	// See: MessageEnvelope
 	// See: IMessageQueue
 	ReceiveMessage(envelope *MessageEnvelope, queue IMessageQueue) (err error)
