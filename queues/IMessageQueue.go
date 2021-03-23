@@ -23,7 +23,7 @@ type IMessageQueue interface {
 
 	// GetCapabilities method are gets the queue capabilities
 	// Return the queue's capabilities object.
-	GetCapabilities() MessagingCapabilities
+	GetCapabilities() *MessagingCapabilities
 
 	// MessageCount method are reads the current number of messages in the queue to be delivered.
 	// Returns number of messages or error.

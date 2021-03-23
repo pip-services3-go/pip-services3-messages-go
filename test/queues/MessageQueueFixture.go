@@ -24,10 +24,6 @@ func (c *MessageQueueFixture) TestSendReceiveMessage(t *testing.T) {
 	sndErr := c.queue.Send("", envelope1)
 	assert.Nil(t, sndErr)
 
-	count, rdErr := c.queue.MessageCount()
-	assert.Nil(t, rdErr)
-	assert.Greater(t, count, (int64)(0))
-
 	envelope2, rcvErr := c.queue.Receive("", 10000*time.Millisecond)
 	assert.Nil(t, rcvErr)
 	assert.NotNil(t, envelope2)
@@ -49,7 +45,6 @@ func (c *MessageQueueFixture) TestReceiveSendMessage(t *testing.T) {
 	assert.Equal(t, envelope1.MessageType, envelope2.MessageType)
 	assert.Equal(t, envelope1.Message, envelope2.Message)
 	assert.Equal(t, envelope1.CorrelationId, envelope2.CorrelationId)
-
 }
 
 func (c *MessageQueueFixture) TestReceiveCompleteMessage(t *testing.T) {
@@ -71,7 +66,6 @@ func (c *MessageQueueFixture) TestReceiveCompleteMessage(t *testing.T) {
 	cplErr := c.queue.Complete(envelope2)
 	assert.Nil(t, cplErr)
 	assert.Nil(t, envelope2.GetReference())
-
 }
 
 func (c *MessageQueueFixture) TestReceiveAbandonMessage(t *testing.T) {
@@ -148,7 +142,7 @@ func (c *MessageQueueFixture) TestOnMessage(t *testing.T) {
 
 	time.Sleep(1000 * time.Millisecond)
 
-	envelope2 := receiver.envelope
+	envelope2 := receiver.Message
 	assert.NotNil(t, envelope2)
 	assert.Equal(t, envelope1.MessageType, envelope2.MessageType)
 	assert.Equal(t, envelope1.Message, envelope2.Message)
@@ -158,10 +152,10 @@ func (c *MessageQueueFixture) TestOnMessage(t *testing.T) {
 }
 
 type TestMsgReceiver struct {
-	envelope *queues.MessageEnvelope
+	Message *queues.MessageEnvelope
 }
 
-func (c *TestMsgReceiver) ReceiveMessage(envelope *queues.MessageEnvelope, queue queues.IMessageQueue) (err error) {
-	c.envelope = envelope
+func (c *TestMsgReceiver) ReceiveMessage(message *queues.MessageEnvelope, queue queues.IMessageQueue) (err error) {
+	c.Message = message
 	return nil
 }

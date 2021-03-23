@@ -1,4 +1,4 @@
-package queues
+package connect
 
 // IMessageQueueConnection Interface for queue connections
 type IMessageQueueConnection interface {

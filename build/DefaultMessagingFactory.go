@@ -32,7 +32,7 @@ func NewDefaultMessagingFactory() *DefaultMessagingFactory {
 
 		return queues.NewMemoryMessageQueue(name)
 	})
-	c.RegisterType(memoryQueueFactoryDescriptor, NewMessageQueueFactory)
+	c.RegisterType(memoryQueueFactoryDescriptor, NewMemoryMessageQueueFactory)
 
 	return &c
 }

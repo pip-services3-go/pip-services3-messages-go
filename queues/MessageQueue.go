@@ -72,6 +72,7 @@ func InheritMessageQueue(overrides IMessageQueueOverrides, name string) *Message
 	c.Counters = ccount.NewCompositeCounters()
 	c.ConnectionResolver = ccon.NewEmptyConnectionResolver()
 	c.CredentialResolver = cauth.NewEmptyCredentialResolver()
+	c.Capabilities = NewMessagingCapabilities(false, false, false, false, false, false, false, false, false)
 	return &c
 }
 
@@ -83,8 +84,8 @@ func (c *MessageQueue) GetName() string {
 
 // GetCapabilities method are gets the queue capabilities
 // Return the queue's capabilities object.
-func (c *MessageQueue) GetCapabilities() MessagingCapabilities {
-	return *c.Capabilities
+func (c *MessageQueue) GetCapabilities() *MessagingCapabilities {
+	return c.Capabilities
 }
 
 // Configure method are configures component by passing configuration parameters.
