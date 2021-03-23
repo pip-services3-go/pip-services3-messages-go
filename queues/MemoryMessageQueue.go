@@ -111,9 +111,9 @@ func (c *MemoryMessageQueue) Clear(correlationId string) (err error) {
 	return nil
 }
 
-// MessageCount method are reads the current number of messages in the queue to be delivered.
+// ReadMessageCount method are reads the current number of messages in the queue to be delivered.
 // Returns: number of messages or error.
-func (c *MemoryMessageQueue) MessageCount() (count int64, err error) {
+func (c *MemoryMessageQueue) ReadMessageCount() (count int64, err error) {
 	c.Lock.Lock()
 	defer c.Lock.Unlock()
 

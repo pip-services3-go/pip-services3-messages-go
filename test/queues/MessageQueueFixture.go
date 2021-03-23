@@ -52,7 +52,7 @@ func (c *MessageQueueFixture) TestReceiveCompleteMessage(t *testing.T) {
 	sndErr := c.queue.Send("", envelope1)
 	assert.Nil(t, sndErr)
 
-	count, rdErr := c.queue.MessageCount()
+	count, rdErr := c.queue.ReadMessageCount()
 	assert.Nil(t, rdErr)
 	assert.Greater(t, count, (int64)(0))
 

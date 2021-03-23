@@ -25,9 +25,9 @@ type IMessageQueue interface {
 	// Return the queue's capabilities object.
 	Capabilities() *MessagingCapabilities
 
-	// MessageCount method are reads the current number of messages in the queue to be delivered.
+	// ReadMessageCount method are reads the current number of messages in the queue to be delivered.
 	// Returns number of messages or error.
-	MessageCount() (count int64, err error)
+	ReadMessageCount() (count int64, err error)
 
 	// Send method are sends a message into the queue.
 	//  - correlationId     (optional) transaction id to trace execution through call chain.
