@@ -51,8 +51,9 @@ type MemoryMessageQueue struct {
 func NewMemoryMessageQueue(name string) *MemoryMessageQueue {
 	c := MemoryMessageQueue{}
 
-	c.MessageQueue = *InheritMessageQueue(&c, name)
-	c.Capabilities = NewMessagingCapabilities(true, true, true, true, true, true, true, false, true)
+	c.MessageQueue = *InheritMessageQueue(
+		&c, name, NewMessagingCapabilities(true, true, true, true, true, true, true, false, true),
+	)
 
 	c.messages = make([]MessageEnvelope, 0)
 	c.lockTokenSequence = 0
@@ -79,7 +80,7 @@ func (c *MemoryMessageQueue) OpenWithParams(correlationId string, connections []
 
 	c.opened = true
 
-	c.Logger.Trace(correlationId, "Opened queue %s", c.GetName())
+	c.Logger.Trace(correlationId, "Opened queue %s", c.Name())
 
 	return nil
 }
@@ -91,7 +92,7 @@ func (c *MemoryMessageQueue) Close(correlationId string) (err error) {
 	c.opened = false
 	atomic.StoreInt32(&c.cancel, 1)
 
-	c.Logger.Trace(correlationId, "Closed queue %s", c.GetName())
+	c.Logger.Trace(correlationId, "Closed queue %s", c.Name())
 
 	return nil
 }
@@ -132,8 +133,8 @@ func (c *MemoryMessageQueue) Send(correlationId string, envelope *MessageEnvelop
 	c.messages = append(c.messages, *envelope)
 	c.Lock.Unlock()
 
-	c.Counters.IncrementOne("queue." + c.GetName() + ".sent_messages")
-	c.Logger.Debug(envelope.CorrelationId, "Sent message %s via %s", envelope.String(), c.GetName())
+	c.Counters.IncrementOne("queue." + c.Name() + ".sent_messages")
+	c.Logger.Debug(envelope.CorrelationId, "Sent message %s via %s", envelope.String(), c.Name())
 
 	return nil
 }
@@ -177,7 +178,7 @@ func (c *MemoryMessageQueue) PeekBatch(correlationId string, messageCount int64)
 		messages = append(messages, &message)
 	}
 
-	c.Logger.Trace(correlationId, "Peeked %d messages on %s", len(messages), c.GetName())
+	c.Logger.Trace(correlationId, "Peeked %d messages on %s", len(messages), c.Name())
 
 	return messages, nil
 }
@@ -223,8 +224,8 @@ func (c *MemoryMessageQueue) Receive(correlationId string, waitTimeout time.Dura
 	}
 
 	if message != nil {
-		c.Counters.IncrementOne("queue." + c.GetName() + ".received_messages")
-		c.Logger.Debug(message.CorrelationId, "Received message %s via %s", message, c.GetName())
+		c.Counters.IncrementOne("queue." + c.Name() + ".received_messages")
+		c.Logger.Debug(message.CorrelationId, "Received message %s via %s", message, c.Name())
 	}
 
 	return message, nil
@@ -255,7 +256,7 @@ func (c *MemoryMessageQueue) RenewLock(message *MessageEnvelope, lockTimeout tim
 	}
 	c.Lock.Unlock()
 
-	c.Logger.Trace(message.CorrelationId, "Renewed lock for message %s at %s", message, c.GetName())
+	c.Logger.Trace(message.CorrelationId, "Renewed lock for message %s at %s", message, c.Name())
 
 	return nil
 }
@@ -276,7 +277,7 @@ func (c *MemoryMessageQueue) Complete(message *MessageEnvelope) (err error) {
 	message.SetReference(nil)
 	c.Lock.Unlock()
 
-	c.Logger.Trace(message.CorrelationId, "Completed message %s at %s", message, c.GetName())
+	c.Logger.Trace(message.CorrelationId, "Completed message %s at %s", message, c.Name())
 
 	return nil
 }
@@ -313,7 +314,7 @@ func (c *MemoryMessageQueue) Abandon(message *MessageEnvelope) (err error) {
 	}
 	c.Lock.Unlock()
 
-	c.Logger.Trace(message.CorrelationId, "Abandoned message %s at %s", message, c.GetName())
+	c.Logger.Trace(message.CorrelationId, "Abandoned message %s at %s", message, c.Name())
 
 	// Add back to message queue
 	return c.Send(message.CorrelationId, message)
@@ -334,8 +335,8 @@ func (c *MemoryMessageQueue) MoveToDeadLetter(message *MessageEnvelope) (err err
 	message.SetReference(nil)
 	c.Lock.Unlock()
 
-	c.Counters.IncrementOne("queue." + c.GetName() + ".dead_messages")
-	c.Logger.Trace(message.CorrelationId, "Moved to dead message %s at %s", message, c.GetName())
+	c.Counters.IncrementOne("queue." + c.Name() + ".dead_messages")
+	c.Logger.Trace(message.CorrelationId, "Moved to dead message %s at %s", message, c.Name())
 
 	return nil
 }

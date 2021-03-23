@@ -17,13 +17,13 @@ import (
 type IMessageQueue interface {
 	crun.IOpenable
 
-	// GetName are gets the queue name
+	// Name are gets the queue name
 	// Return the queue name.
-	GetName() string
+	Name() string
 
-	// GetCapabilities method are gets the queue capabilities
+	// Capabilities method are gets the queue capabilities
 	// Return the queue's capabilities object.
-	GetCapabilities() *MessagingCapabilities
+	Capabilities() *MessagingCapabilities
 
 	// MessageCount method are reads the current number of messages in the queue to be delivered.
 	// Returns number of messages or error.

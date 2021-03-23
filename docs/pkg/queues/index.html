@@ -247,10 +247,10 @@
 					<dd>&nbsp; &nbsp; <a href="index.html#MessageQueue.Configure">func (c *MessageQueue) Configure(config *cconf.ConfigParams)</a></dd>
 				
 					
-					<dd>&nbsp; &nbsp; <a href="index.html#MessageQueue.GetCapabilities">func (c *MessageQueue) GetCapabilities() MessagingCapabilities</a></dd>
+					<dd>&nbsp; &nbsp; <a href="index.html#MessageQueue.Capabilities">func (c *MessageQueue) Capabilities() MessagingCapabilities</a></dd>
 				
 					
-					<dd>&nbsp; &nbsp; <a href="index.html#MessageQueue.GetName">func (c *MessageQueue) GetName() string</a></dd>
+					<dd>&nbsp; &nbsp; <a href="index.html#MessageQueue.Name">func (c *MessageQueue) Name() string</a></dd>
 				
 					
 					<dd>&nbsp; &nbsp; <a href="index.html#MessageQueue.Open">func (c *MessageQueue) Open(correlationId string) error</a></dd>
@@ -415,13 +415,13 @@ See MessagingCapabilities
 			<pre>type IMessageQueue interface {
     <a href="http://localhost:6060/pkg/github.com/pip-services3-go/pip-services3-commons-go/run/">crun</a>.<a href="http://localhost:6060/pkg/github.com/pip-services3-go/pip-services3-commons-go/run/#IOpenable">IOpenable</a>
 
-    <span class="comment">// GetName are gets the queue name</span>
+    <span class="comment">// Name are gets the queue name</span>
     <span class="comment">// Return the queue name.</span>
-    GetName() <a href="http://localhost:6060/pkg/builtin/#string">string</a>
+    Name() <a href="http://localhost:6060/pkg/builtin/#string">string</a>
 
-    <span class="comment">// GetCapabilities method are gets the queue capabilities</span>
+    <span class="comment">// Capabilities method are gets the queue capabilities</span>
     <span class="comment">// Return the queue&#39;s capabilities object.</span>
-    GetCapabilities() <a href="index.html#MessagingCapabilities">MessagingCapabilities</a>
+    Capabilities() <a href="index.html#MessagingCapabilities">MessagingCapabilities</a>
 
     <span class="comment">// MessageCount method are reads the current number of messages in the queue to be delivered.</span>
     <span class="comment">// Returns number of messages or error.</span>
@@ -1356,14 +1356,14 @@ Configure method are configures component by passing configuration parameters.
 				
 			
 				
-				<h3 id="MessageQueue.GetCapabilities">func (*MessageQueue) <a href="http://localhost:6060/src/queues/MessageQueue.go?s=3376:3438#L76">GetCapabilities</a>
-					<a class="permalink" href="index.html#MessageQueue.GetCapabilities">&#xb6;</a>
+				<h3 id="MessageQueue.Capabilities">func (*MessageQueue) <a href="http://localhost:6060/src/queues/MessageQueue.go?s=3376:3438#L76">Capabilities</a>
+					<a class="permalink" href="index.html#MessageQueue.Capabilities">&#xb6;</a>
 					
 					
 				</h3>
-				<pre>func (c *<a href="index.html#MessageQueue">MessageQueue</a>) GetCapabilities() <a href="index.html#MessagingCapabilities">MessagingCapabilities</a></pre>
+				<pre>func (c *<a href="index.html#MessageQueue">MessageQueue</a>) Capabilities() <a href="index.html#MessagingCapabilities">MessagingCapabilities</a></pre>
 				<p>
-GetCapabilities method are gets the queue capabilities
+Capabilities method are gets the queue capabilities
 Return the queue&#39;s capabilities object.
 </p>
 
@@ -1372,14 +1372,14 @@ Return the queue&#39;s capabilities object.
 				
 			
 				
-				<h3 id="MessageQueue.GetName">func (*MessageQueue) <a href="http://localhost:6060/src/queues/MessageQueue.go?s=3215:3254#L70">GetName</a>
-					<a class="permalink" href="index.html#MessageQueue.GetName">&#xb6;</a>
+				<h3 id="MessageQueue.Name">func (*MessageQueue) <a href="http://localhost:6060/src/queues/MessageQueue.go?s=3215:3254#L70">Name</a>
+					<a class="permalink" href="index.html#MessageQueue.Name">&#xb6;</a>
 					
 					
 				</h3>
-				<pre>func (c *<a href="index.html#MessageQueue">MessageQueue</a>) GetName() <a href="http://localhost:6060/pkg/builtin/#string">string</a></pre>
+				<pre>func (c *<a href="index.html#MessageQueue">MessageQueue</a>) Name() <a href="http://localhost:6060/pkg/builtin/#string">string</a></pre>
 				<p>
-GetName method are gets the queue name
+Name method are gets the queue name
 Return the queue name.
 </p>
 

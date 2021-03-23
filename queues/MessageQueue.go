@@ -50,51 +50,59 @@ References:
 - *:credential-store:*:*:1.0 (optional)  ICredentialStore componetns to lookup credential(s)
 */
 type MessageQueue struct {
-	IMessageQueueOverrides
+	Overrides          IMessageQueueOverrides
 	Logger             *clog.CompositeLogger
 	Counters           *ccount.CompositeCounters
 	ConnectionResolver *ccon.ConnectionResolver
 	CredentialResolver *cauth.CredentialResolver
-	Name               string
-	Capabilities       *MessagingCapabilities
 	Lock               sync.Mutex
+	name               string
+	capabilities       *MessagingCapabilities
 }
 
 // NewMessageQueue method are creates a new instance of the message queue.
 //   - overrides a message queue overrides
 //   - name  (optional) a queue name
-func InheritMessageQueue(overrides IMessageQueueOverrides, name string) *MessageQueue {
+//   - capabilities (optional) capabilities of this message queue
+func InheritMessageQueue(overrides IMessageQueueOverrides, name string, capabilities *MessagingCapabilities) *MessageQueue {
 	c := MessageQueue{
-		IMessageQueueOverrides: overrides,
-		Name:                   name,
+		Overrides:    overrides,
+		name:         name,
+		capabilities: capabilities,
 	}
 	c.Logger = clog.NewCompositeLogger()
 	c.Counters = ccount.NewCompositeCounters()
 	c.ConnectionResolver = ccon.NewEmptyConnectionResolver()
 	c.CredentialResolver = cauth.NewEmptyCredentialResolver()
-	c.Capabilities = NewMessagingCapabilities(false, false, false, false, false, false, false, false, false)
+
+	if c.capabilities == nil {
+		NewMessagingCapabilities(false, false, false, false, false, false, false, false, false)
+	}
+
 	return &c
 }
 
-// GetName method are gets the queue name
+// Name method are gets the queue name
 // Return the queue name.
-func (c *MessageQueue) GetName() string {
-	return c.Name
+func (c *MessageQueue) Name() string {
+	return c.name
 }
 
-// GetCapabilities method are gets the queue capabilities
+// Capabilities method are gets the queue capabilities
 // Return the queue's capabilities object.
-func (c *MessageQueue) GetCapabilities() *MessagingCapabilities {
-	return c.Capabilities
+func (c *MessageQueue) Capabilities() *MessagingCapabilities {
+	return c.capabilities
 }
 
 // Configure method are configures component by passing configuration parameters.
 //   - config    configuration parameters to be set.
 func (c *MessageQueue) Configure(config *cconf.ConfigParams) {
-	c.Name = cconf.NameResolver.ResolveWithDefault(config, c.Name)
 	c.Logger.Configure(config)
 	c.ConnectionResolver.Configure(config)
 	c.CredentialResolver.Configure(config)
+
+	c.name = cconf.NameResolver.ResolveWithDefault(config, c.name)
+	c.name = config.GetAsStringWithDefault("queue", c.name)
 }
 
 // SetReferences mmethod are sets references to dependent components.
@@ -124,14 +132,14 @@ func (c *MessageQueue) Open(correlationId string) error {
 		return err
 	}
 
-	return c.OpenWithParams(correlationId, connections, credential)
+	return c.Overrides.OpenWithParams(correlationId, connections, credential)
 }
 
 // Checks if message queue has been opened
 //   - correlationId     (optional) transaction id to trace execution through call chain.
 // Returns: error or null for success.
 func (c *MessageQueue) CheckOpen(correlationId string) error {
-	if !c.IsOpen() {
+	if !c.Overrides.IsOpen() {
 		err := cerr.NewInvalidStateError(
 			correlationId,
 			"NOT_OPENED",
@@ -152,7 +160,7 @@ func (c *MessageQueue) CheckOpen(correlationId string) error {
 func (c *MessageQueue) SendAsObject(correlationId string, messageType string, message interface{}) (err error) {
 	envelope := NewMessageEnvelope(correlationId, messageType, nil)
 	envelope.SetMessageAsJson(message)
-	return c.Send(correlationId, envelope)
+	return c.Overrides.Send(correlationId, envelope)
 }
 
 // BeginListen method are listens for incoming messages without blocking the current thread.
@@ -162,9 +170,9 @@ func (c *MessageQueue) SendAsObject(correlationId string, messageType string, me
 // See IMessageReceiver
 func (c *MessageQueue) BeginListen(correlationId string, receiver IMessageReceiver) {
 	go func() {
-		err := c.Listen(correlationId, receiver)
+		err := c.Overrides.Listen(correlationId, receiver)
 		if err != nil {
-			c.Logger.Error(correlationId, err, "Failed to listed the message queue "+c.Name)
+			c.Logger.Error(correlationId, err, "Failed to listed the message queue "+c.Name())
 		}
 	}()
 }
@@ -172,5 +180,5 @@ func (c *MessageQueue) BeginListen(correlationId string, receiver IMessageReceiv
 // String method are gets a string representation of the object.
 // Return a string representation of the object.
 func (c *MessageQueue) String() string {
-	return "[" + c.GetName() + "]"
+	return "[" + c.Name() + "]"
 }
