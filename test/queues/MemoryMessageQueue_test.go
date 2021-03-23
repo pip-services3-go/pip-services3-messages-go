@@ -22,5 +22,4 @@ func TestMemoryMessageQueue(t *testing.T) {
 	t.Run("MemoryMessageQueue:Peek No Message", fixture.TestPeekNoMessage)
 	t.Run("MemoryMessageQueue:Move To Dead Message", fixture.TestMoveToDeadMessage)
 	t.Run("MemoryMessageQueue:On Message", fixture.TestOnMessage)
-
 }
