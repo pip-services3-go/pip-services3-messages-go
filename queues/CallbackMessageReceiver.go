@@ -1,5 +1,6 @@
 package queues
 
+// CallbackMessageReceiver allows to wrap message callback into IMessageReceiver
 type CallbackMessageReceiver struct {
 	Callback func(message *MessageEnvelope, queue IMessageQueue) error
 }

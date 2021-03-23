@@ -129,6 +129,11 @@
 				
 			
 				
+				<dd><a href="index.html#IMessageQueueConnection">type IMessageQueueConnection</a></dd>
+				
+				
+			
+				
 				<dd><a href="index.html#IMessageQueueOverrides">type IMessageQueueOverrides</a></dd>
 				
 				
@@ -310,6 +315,8 @@
 			
 				<a href="http://localhost:6060/src/queues/IMessageQueue.go">IMessageQueue.go</a>
 			
+				<a href="http://localhost:6060/src/queues/IMessageQueueConnection.go">IMessageQueueConnection.go</a>
+			
 				<a href="http://localhost:6060/src/queues/IMessageReceiver.go">IMessageReceiver.go</a>
 			
 				<a href="http://localhost:6060/src/queues/LockedMessage.go">LockedMessage.go</a>
@@ -336,12 +343,15 @@
 		
 			
 			
-			<h2 id="CallbackMessageReceiver">type <a href="http://localhost:6060/src/queues/CallbackMessageReceiver.go?s=16:123#L1">CallbackMessageReceiver</a>
+			<h2 id="CallbackMessageReceiver">type <a href="http://localhost:6060/src/queues/CallbackMessageReceiver.go?s=97:204#L1">CallbackMessageReceiver</a>
 				<a class="permalink" href="index.html#CallbackMessageReceiver">&#xb6;</a>
 				
 				
 			</h2>
-			
+			<p>
+CallbackMessageReceiver allows to wrap message callback into IMessageReceiver
+</p>
+
 			<pre>type CallbackMessageReceiver struct {
 <span id="CallbackMessageReceiver.Callback"></span>    Callback func(message *<a href="index.html#MessageEnvelope">MessageEnvelope</a>, queue <a href="index.html#IMessageQueue">IMessageQueue</a>) <a href="http://localhost:6060/pkg/builtin/#error">error</a>
 }
@@ -357,7 +367,7 @@
 
 			
 				
-				<h3 id="NewCallbackMessageReceiver">func <a href="http://localhost:6060/src/queues/CallbackMessageReceiver.go?s=125:249#L1">NewCallbackMessageReceiver</a>
+				<h3 id="NewCallbackMessageReceiver">func <a href="http://localhost:6060/src/queues/CallbackMessageReceiver.go?s=206:330#L1">NewCallbackMessageReceiver</a>
 					<a class="permalink" href="index.html#NewCallbackMessageReceiver">&#xb6;</a>
 					
 					
@@ -370,7 +380,7 @@
 
 			
 				
-				<h3 id="CallbackMessageReceiver.ReceiveMessage">func (*CallbackMessageReceiver) <a href="http://localhost:6060/src/queues/CallbackMessageReceiver.go?s=322:429#L4">ReceiveMessage</a>
+				<h3 id="CallbackMessageReceiver.ReceiveMessage">func (*CallbackMessageReceiver) <a href="http://localhost:6060/src/queues/CallbackMessageReceiver.go?s=403:510#L5">ReceiveMessage</a>
 					<a class="permalink" href="index.html#CallbackMessageReceiver.ReceiveMessage">&#xb6;</a>
 					
 					
@@ -495,6 +505,33 @@ See MessagingCapabilities
     <span class="comment">// When this method is call listen unblocks the thread and execution continues.</span>
     <span class="comment">//   - correlationId     (optional) transaction id to trace execution through call chain.</span>
     EndListen(correlationId <a href="http://localhost:6060/pkg/builtin/#string">string</a>)
+}</pre>
+
+			
+
+			
+
+			
+			
+			
+
+			
+
+			
+		
+			
+			
+			<h2 id="IMessageQueueConnection">type <a href="http://localhost:6060/src/queues/IMessageQueueConnection.go?s=75:152#L1">IMessageQueueConnection</a>
+				<a class="permalink" href="index.html#IMessageQueueConnection">&#xb6;</a>
+				
+				
+			</h2>
+			<p>
+IMessageQueueConnection Interface for queue connections
+</p>
+
+			<pre>type IMessageQueueConnection interface {
+    GetQueueNames() ([]<a href="http://localhost:6060/pkg/builtin/#string">string</a>, <a href="http://localhost:6060/pkg/builtin/#error">error</a>)
 }</pre>
 
 			
@@ -701,7 +738,7 @@ See MessagingCapabilities
 
 			
 				
-				<h3 id="MemoryMessageQueue.Abandon">func (*MemoryMessageQueue) <a href="http://localhost:6060/src/queues/MemoryMessageQueue.go?s=9301:9375#L278">Abandon</a>
+				<h3 id="MemoryMessageQueue.Abandon">func (*MemoryMessageQueue) <a href="http://localhost:6060/src/queues/MemoryMessageQueue.go?s=9318:9392#L280">Abandon</a>
 					<a class="permalink" href="index.html#MemoryMessageQueue.Abandon">&#xb6;</a>
 					
 					
@@ -724,7 +761,7 @@ Returns: error or nil for success.
 				
 			
 				
-				<h3 id="MemoryMessageQueue.Clear">func (*MemoryMessageQueue) <a href="http://localhost:6060/src/queues/MemoryMessageQueue.go?s=3061:3129#L90">Clear</a>
+				<h3 id="MemoryMessageQueue.Clear">func (*MemoryMessageQueue) <a href="http://localhost:6060/src/queues/MemoryMessageQueue.go?s=3073:3141#L92">Clear</a>
 					<a class="permalink" href="index.html#MemoryMessageQueue.Clear">&#xb6;</a>
 					
 					
@@ -744,7 +781,7 @@ Returns: error or nil no errors occured.
 				
 			
 				
-				<h3 id="MemoryMessageQueue.Close">func (*MemoryMessageQueue) <a href="http://localhost:6060/src/queues/MemoryMessageQueue.go?s=2689:2757#L78">Close</a>
+				<h3 id="MemoryMessageQueue.Close">func (*MemoryMessageQueue) <a href="http://localhost:6060/src/queues/MemoryMessageQueue.go?s=2696:2764#L80">Close</a>
 					<a class="permalink" href="index.html#MemoryMessageQueue.Close">&#xb6;</a>
 					
 					
@@ -764,7 +801,7 @@ Returns: error or nil no errors occured.
 				
 			
 				
-				<h3 id="MemoryMessageQueue.Complete">func (*MemoryMessageQueue) <a href="http://localhost:6060/src/queues/MemoryMessageQueue.go?s=8488:8563#L255">Complete</a>
+				<h3 id="MemoryMessageQueue.Complete">func (*MemoryMessageQueue) <a href="http://localhost:6060/src/queues/MemoryMessageQueue.go?s=8504:8579#L257">Complete</a>
 					<a class="permalink" href="index.html#MemoryMessageQueue.Complete">&#xb6;</a>
 					
 					
@@ -785,7 +822,7 @@ Returns: error or nil for success.
 				
 			
 				
-				<h3 id="MemoryMessageQueue.EndListen">func (*MemoryMessageQueue) <a href="http://localhost:6060/src/queues/MemoryMessageQueue.go?s=12220:12280#L372">EndListen</a>
+				<h3 id="MemoryMessageQueue.EndListen">func (*MemoryMessageQueue) <a href="http://localhost:6060/src/queues/MemoryMessageQueue.go?s=12239:12299#L374">EndListen</a>
 					<a class="permalink" href="index.html#MemoryMessageQueue.EndListen">&#xb6;</a>
 					
 					
@@ -819,7 +856,7 @@ Return true if the component has been opened and false otherwise.
 				
 			
 				
-				<h3 id="MemoryMessageQueue.Listen">func (*MemoryMessageQueue) <a href="http://localhost:6060/src/queues/MemoryMessageQueue.go?s=11042:11132#L336">Listen</a>
+				<h3 id="MemoryMessageQueue.Listen">func (*MemoryMessageQueue) <a href="http://localhost:6060/src/queues/MemoryMessageQueue.go?s=11061:11151#L338">Listen</a>
 					<a class="permalink" href="index.html#MemoryMessageQueue.Listen">&#xb6;</a>
 					
 					
@@ -841,7 +878,7 @@ See Receive
 				
 			
 				
-				<h3 id="MemoryMessageQueue.MessageCount">func (*MemoryMessageQueue) <a href="http://localhost:6060/src/queues/MemoryMessageQueue.go?s=3448:3516#L103">MessageCount</a>
+				<h3 id="MemoryMessageQueue.MessageCount">func (*MemoryMessageQueue) <a href="http://localhost:6060/src/queues/MemoryMessageQueue.go?s=3460:3528#L105">MessageCount</a>
 					<a class="permalink" href="index.html#MemoryMessageQueue.MessageCount">&#xb6;</a>
 					
 					
@@ -857,7 +894,7 @@ Returns: number of messages or error.
 				
 			
 				
-				<h3 id="MemoryMessageQueue.MoveToDeadLetter">func (*MemoryMessageQueue) <a href="http://localhost:6060/src/queues/MemoryMessageQueue.go?s=10271:10354#L313">MoveToDeadLetter</a>
+				<h3 id="MemoryMessageQueue.MoveToDeadLetter">func (*MemoryMessageQueue) <a href="http://localhost:6060/src/queues/MemoryMessageQueue.go?s=10289:10372#L315">MoveToDeadLetter</a>
 					<a class="permalink" href="index.html#MemoryMessageQueue.MoveToDeadLetter">&#xb6;</a>
 					
 					
@@ -877,12 +914,13 @@ Returns: error or nil for success.
 				
 			
 				
-				<h3 id="MemoryMessageQueue.OpenWithParams">func (*MemoryMessageQueue) <a href="http://localhost:6060/src/queues/MemoryMessageQueue.go?s=2250:2400#L67">OpenWithParams</a>
+				<h3 id="MemoryMessageQueue.OpenWithParams">func (*MemoryMessageQueue) <a href="http://localhost:6060/src/queues/MemoryMessageQueue.go?s=2250:2401#L67">OpenWithParams</a>
 					<a class="permalink" href="index.html#MemoryMessageQueue.OpenWithParams">&#xb6;</a>
 					
 					
 				</h3>
-				<pre>func (c *<a href="index.html#MemoryMessageQueue">MemoryMessageQueue</a>) OpenWithParams(correlationId <a href="http://localhost:6060/pkg/builtin/#string">string</a>, connections []*<a href="http://localhost:6060/pkg/github.com/pip-services3-go/pip-services3-components-go/connect/">ccon</a>.<a href="http://localhost:6060/pkg/github.com/pip-services3-go/pip-services3-components-go/connect/#ConnectionParams">ConnectionParams</a>, credential *<a href="http://localhost:6060/pkg/github.com/pip-services3-go/pip-services3-components-go/auth/">auth</a>.<a href="http://localhost:6060/pkg/github.com/pip-services3-go/pip-services3-components-go/auth/#CredentialParams">CredentialParams</a>) (err <a href="http://localhost:6060/pkg/builtin/#error">error</a>)</pre>
+				<pre>func (c *<a href="index.html#MemoryMessageQueue">MemoryMessageQueue</a>) OpenWithParams(correlationId <a href="http://localhost:6060/pkg/builtin/#string">string</a>, connections []*<a href="http://localhost:6060/pkg/github.com/pip-services3-go/pip-services3-components-go/connect/">ccon</a>.<a href="http://localhost:6060/pkg/github.com/pip-services3-go/pip-services3-components-go/connect/#ConnectionParams">ConnectionParams</a>,
+    credential *<a href="http://localhost:6060/pkg/github.com/pip-services3-go/pip-services3-components-go/auth/">auth</a>.<a href="http://localhost:6060/pkg/github.com/pip-services3-go/pip-services3-components-go/auth/#CredentialParams">CredentialParams</a>) (err <a href="http://localhost:6060/pkg/builtin/#error">error</a>)</pre>
 				<p>
 OpenWithParams method are opens the component with given connection and credential parameters.
 </p>
@@ -899,7 +937,7 @@ Retruns: error or nil no errors occured.
 				
 			
 				
-				<h3 id="MemoryMessageQueue.Peek">func (*MemoryMessageQueue) <a href="http://localhost:6060/src/queues/MemoryMessageQueue.go?s=4542:4634#L133">Peek</a>
+				<h3 id="MemoryMessageQueue.Peek">func (*MemoryMessageQueue) <a href="http://localhost:6060/src/queues/MemoryMessageQueue.go?s=4555:4647#L135">Peek</a>
 					<a class="permalink" href="index.html#MemoryMessageQueue.Peek">&#xb6;</a>
 					
 					
@@ -920,7 +958,7 @@ Returns: a message or error.
 				
 			
 				
-				<h3 id="MemoryMessageQueue.PeekBatch">func (*MemoryMessageQueue) <a href="http://localhost:6060/src/queues/MemoryMessageQueue.go?s=5281:5400#L155">PeekBatch</a>
+				<h3 id="MemoryMessageQueue.PeekBatch">func (*MemoryMessageQueue) <a href="http://localhost:6060/src/queues/MemoryMessageQueue.go?s=5294:5413#L157">PeekBatch</a>
 					<a class="permalink" href="index.html#MemoryMessageQueue.PeekBatch">&#xb6;</a>
 					
 					
@@ -942,7 +980,7 @@ Returns: a list with messages or error.
 				
 			
 				
-				<h3 id="MemoryMessageQueue.Receive">func (*MemoryMessageQueue) <a href="http://localhost:6060/src/queues/MemoryMessageQueue.go?s=6084:6195#L177">Receive</a>
+				<h3 id="MemoryMessageQueue.Receive">func (*MemoryMessageQueue) <a href="http://localhost:6060/src/queues/MemoryMessageQueue.go?s=6098:6209#L179">Receive</a>
 					<a class="permalink" href="index.html#MemoryMessageQueue.Receive">&#xb6;</a>
 					
 					
@@ -961,7 +999,7 @@ Returns: a message or error.
 				
 			
 				
-				<h3 id="MemoryMessageQueue.RenewLock">func (*MemoryMessageQueue) <a href="http://localhost:6060/src/queues/MemoryMessageQueue.go?s=7571:7674#L226">RenewLock</a>
+				<h3 id="MemoryMessageQueue.RenewLock">func (*MemoryMessageQueue) <a href="http://localhost:6060/src/queues/MemoryMessageQueue.go?s=7586:7689#L228">RenewLock</a>
 					<a class="permalink" href="index.html#MemoryMessageQueue.RenewLock">&#xb6;</a>
 					
 					
@@ -983,7 +1021,7 @@ Returns:  error or nil for success.
 				
 			
 				
-				<h3 id="MemoryMessageQueue.Send">func (*MemoryMessageQueue) <a href="http://localhost:6060/src/queues/MemoryMessageQueue.go?s=3848:3942#L115">Send</a>
+				<h3 id="MemoryMessageQueue.Send">func (*MemoryMessageQueue) <a href="http://localhost:6060/src/queues/MemoryMessageQueue.go?s=3860:3954#L117">Send</a>
 					<a class="permalink" href="index.html#MemoryMessageQueue.Send">&#xb6;</a>
 					
 					

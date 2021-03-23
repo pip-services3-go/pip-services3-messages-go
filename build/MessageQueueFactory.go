@@ -1,6 +1,7 @@
 package build
 
 import (
+	cconf "github.com/pip-services3-go/pip-services3-commons-go/config"
 	cref "github.com/pip-services3-go/pip-services3-commons-go/refer"
 	"github.com/pip-services3-go/pip-services3-components-go/build"
 	"github.com/pip-services3-go/pip-services3-messaging-go/queues"
@@ -13,6 +14,8 @@ import (
 // See MemoryMessageQueue
 type MessageQueueFactory struct {
 	build.Factory
+	config     *cconf.ConfigParams
+	references cref.IReferences
 }
 
 // NewMessageQueueFactory method are create a new instance of the factory.
@@ -28,7 +31,16 @@ func NewMessageQueueFactory() *MessageQueueFactory {
 			name = descriptor.Name()
 		}
 
-		return queues.NewMemoryMessageQueue(name)
+		queue := queues.NewMemoryMessageQueue(name)
+
+		if c.config != nil {
+			queue.Configure(c.config)
+		}
+		if c.references != nil {
+			queue.SetReferences(c.references)
+		}
+
+		return queue
 	})
 
 	return &c
