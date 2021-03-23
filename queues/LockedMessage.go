@@ -2,12 +2,9 @@ package queues
 
 import "time"
 
-/*
-LockedMessage data object used to store and lock incoming messages in MemoryMessageQueue.
-See: MemoryMessageQueue
-*/
+// LockedMessage data object used to store and lock incoming messages in MemoryMessageQueue.
+// See: MemoryMessageQueue
 type LockedMessage struct {
-
 	//The incoming message.
 	Message *MessageEnvelope
 

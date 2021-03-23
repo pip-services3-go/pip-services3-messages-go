@@ -1,7 +1,8 @@
 package queues
 
 import (
-	"sync"
+	"fmt"
+	"sync/atomic"
 	"time"
 
 	"github.com/pip-services3-go/pip-services3-components-go/auth"
@@ -38,10 +39,9 @@ type MemoryMessageQueue struct {
 	MessageQueue
 	messages          []MessageEnvelope
 	lockTokenSequence int
-	lockedMessages    map[int]*LockedMessage //lockedMessages { [id: number]: LockedMessage; } = {};
+	lockedMessages    map[int]*LockedMessage
 	opened            bool
-	/* Used to stop the listening process. */
-	cancel bool
+	cancel            int32
 }
 
 // NewMemoryMessageQueue method are creates a new instance of the message queue.
@@ -50,14 +50,16 @@ type MemoryMessageQueue struct {
 // See MessagingCapabilities
 func NewMemoryMessageQueue(name string) *MemoryMessageQueue {
 	c := MemoryMessageQueue{}
-	c.MessageQueue = *NewMessageQueue(name)
-	c.MessageQueue.IMessageQueue = &c
+
+	c.MessageQueue = *InheritMessageQueue(&c, name)
+	c.Capabilities = NewMessagingCapabilities(true, true, true, true, true, true, true, false, true)
+
 	c.messages = make([]MessageEnvelope, 0)
 	c.lockTokenSequence = 0
 	c.lockedMessages = make(map[int]*LockedMessage, 0)
 	c.opened = false
-	c.cancel = false
-	c.Capabilities = NewMessagingCapabilities(true, true, true, true, true, true, true, false, true)
+	c.cancel = 0
+
 	return &c
 }
 
@@ -72,8 +74,11 @@ func (c *MemoryMessageQueue) IsOpen() bool {
 //   - connection        connection parameters
 //   - credential        credential parameters
 // Retruns: error or nil no errors occured.
-func (c *MemoryMessageQueue) OpenWithParams(correlationId string, connection *ccon.ConnectionParams, credential *auth.CredentialParams) (err error) {
+func (c *MemoryMessageQueue) OpenWithParams(correlationId string, connections []*ccon.ConnectionParams, credential *auth.CredentialParams) (err error) {
 	c.opened = true
+
+	c.Logger.Trace(correlationId, "Opened queue %s", c.Name)
+
 	return nil
 }
 
@@ -82,8 +87,10 @@ func (c *MemoryMessageQueue) OpenWithParams(correlationId string, connection *cc
 // Returns: error or nil no errors occured.
 func (c *MemoryMessageQueue) Close(correlationId string) (err error) {
 	c.opened = false
-	c.cancel = true
-	c.Logger.Trace(correlationId, "Closed queue %s", c)
+	atomic.StoreInt32(&c.cancel, 1)
+
+	c.Logger.Trace(correlationId, "Closed queue %s", c.Name)
+
 	return nil
 }
 
@@ -91,15 +98,22 @@ func (c *MemoryMessageQueue) Close(correlationId string) (err error) {
 //   - correlationId 	(optional) transaction id to trace execution through call chain.
 // Returns: error or nil no errors occured.
 func (c *MemoryMessageQueue) Clear(correlationId string) (err error) {
-	c.messages = c.messages[:0]
+	c.Lock.Lock()
+	defer c.Lock.Unlock()
+
+	c.messages = make([]MessageEnvelope, 0)
 	c.lockedMessages = make(map[int]*LockedMessage, 0)
-	c.cancel = false
+	atomic.StoreInt32(&c.cancel, 0)
+
 	return nil
 }
 
-// ReadMessageCount method are reads the current number of messages in the queue to be delivered.
+// MessageCount method are reads the current number of messages in the queue to be delivered.
 // Returns: number of messages or error.
-func (c *MemoryMessageQueue) ReadMessageCount() (count int64, err error) {
+func (c *MemoryMessageQueue) MessageCount() (count int64, err error) {
+	c.Lock.Lock()
+	defer c.Lock.Unlock()
+
 	count = (int64)(len(c.messages))
 	return count, nil
 }
@@ -109,12 +123,16 @@ func (c *MemoryMessageQueue) ReadMessageCount() (count int64, err error) {
 //   - envelope          a message envelop to be sent.
 // Returns: error or nil for success.
 func (c *MemoryMessageQueue) Send(correlationId string, envelope *MessageEnvelope) (err error) {
+	envelope.SentTime = time.Now()
 
-	envelope.Sent_time = time.Now()
 	// Add message to the queue
+	c.Lock.Lock()
 	c.messages = append(c.messages, *envelope)
-	c.Counters.IncrementOne("queue." + c.GetName() + ".sentmessages")
-	c.Logger.Debug(envelope.Correlation_id, "Sent message %s via %s", envelope.ToString(), c.ToString())
+	c.Lock.Unlock()
+
+	c.Counters.IncrementOne("queue." + c.GetName() + ".sent_messages")
+	c.Logger.Debug(envelope.CorrelationId, "Sent message %s via %s", envelope.String(), c.String())
+
 	return nil
 }
 
@@ -123,14 +141,20 @@ func (c *MemoryMessageQueue) Send(correlationId string, envelope *MessageEnvelop
 //   - correlationId     (optional) transaction id to trace execution through call chain.
 // Returns: a message or error.
 func (c *MemoryMessageQueue) Peek(correlationId string) (result *MessageEnvelope, err error) {
-	var message MessageEnvelope
+	var message *MessageEnvelope
+
 	// Pick a message
+	c.Lock.Lock()
 	if len(c.messages) > 0 {
-		message = c.messages[0]
-		c.Logger.Trace(message.Correlation_id, "Peeked message %s on %s", message, c.ToString())
-		return &message, nil
+		message = &c.messages[0]
 	}
-	return nil, nil
+	c.Lock.Unlock()
+
+	if message != nil {
+		c.Logger.Trace(message.CorrelationId, "Peeked message %s on %s", message, c.String())
+	}
+
+	return message, nil
 }
 
 // PeekBatch method are peeks multiple incoming messages from the queue without removing them.
@@ -138,13 +162,21 @@ func (c *MemoryMessageQueue) Peek(correlationId string) (result *MessageEnvelope
 //   - correlationId     (optional) transaction id to trace execution through call chain.
 //   - messageCount      a maximum number of messages to peek.
 // Returns: a list with messages or error.
-func (c *MemoryMessageQueue) PeekBatch(correlationId string, messageCount int64) (result []MessageEnvelope, err error) {
-
-	var messages []MessageEnvelope = make([]MessageEnvelope, 0, 0)
-	if messageCount <= (int64)(len(c.messages)) {
-		messages = c.messages[0:messageCount]
+func (c *MemoryMessageQueue) PeekBatch(correlationId string, messageCount int64) (result []*MessageEnvelope, err error) {
+	c.Lock.Lock()
+	batchMessages := c.messages
+	if messageCount <= (int64)(len(batchMessages)) {
+		batchMessages = batchMessages[0:messageCount]
 	}
-	c.Logger.Trace(correlationId, "Peeked %d messages on %s", len(messages), c.ToString())
+	c.Lock.Unlock()
+
+	messages := []*MessageEnvelope{}
+	for _, message := range batchMessages {
+		messages = append(messages, &message)
+	}
+
+	c.Logger.Trace(correlationId, "Peeked %d messages on %s", len(messages), c.String())
+
 	return messages, nil
 }
 
@@ -152,69 +184,48 @@ func (c *MemoryMessageQueue) PeekBatch(correlationId string, messageCount int64)
 //   - correlationId     (optional) transaction id to trace execution through call chain.
 //   - waitTimeout       a timeout in milliseconds to wait for a message to come.
 // Returns: a message or error.
-func (c *MemoryMessageQueue) Receive(correlationId string, waitTimeout time.Duration) (result *MessageEnvelope, err error) {
-	err = nil
+func (c *MemoryMessageQueue) Receive(correlationId string, waitTimeout time.Duration) (*MessageEnvelope, error) {
+	messageReceived := false
 	var message *MessageEnvelope
-	var messageReceived bool = false
+	elapsedTime := time.Duration(0)
 
-	var checkIntervalMs time.Duration = 100 * time.Millisecond
-	var i time.Duration = 0
-
-	var wg = sync.WaitGroup{}
-	wg.Add(1)
-	go func() {
-		localWg := sync.WaitGroup{}
-
-		for i < waitTimeout && !messageReceived {
-			i = i + checkIntervalMs
-
-			localWg.Add(1)
-			time.AfterFunc(checkIntervalMs, func() {
-				if len(c.messages) == 0 {
-					localWg.Done()
-					return
-				}
-				// Get message from the queue
-				// shift queue
-				var msg MessageEnvelope
-				message = nil
-				for len(c.messages) > 0 {
-					msg, c.messages = c.messages[0], c.messages[1:]
-					message = &msg
-				}
-
-				if message != nil {
-					// Generate and set locked token
-					lockedToken := c.lockTokenSequence
-					c.lockTokenSequence++
-					message.SetReference(lockedToken)
-
-					// Add messages to locked messages list
-					var lockedMessage LockedMessage = LockedMessage{}
-					var now time.Time = time.Now()
-					now = (now.Add(waitTimeout))
-					lockedMessage.ExpirationTime = now
-					lockedMessage.Message = message
-					lockedMessage.Timeout = waitTimeout
-					c.lockedMessages[lockedToken] = &lockedMessage
-
-					messageReceived = true
-
-					c.Counters.IncrementOne("queue." + c.GetName() + ".receivedmessages")
-					c.Logger.Debug(message.Correlation_id, "Received message %s via %s", message, c.ToString())
-				}
-				localWg.Done()
-			})
-
-			localWg.Wait()
+	for elapsedTime < waitTimeout && !messageReceived {
+		c.Lock.Lock()
+		if len(c.messages) == 0 {
+			c.Lock.Unlock()
+			time.Sleep(time.Duration(100) * time.Millisecond)
+			elapsedTime += time.Duration(100)
+			continue
 		}
 
-		wg.Done()
-	}()
+		// Get message from the queue
+		message = &c.messages[0]
+		c.messages = c.messages[1:]
 
-	wg.Wait()
+		// Generate and set locked token
+		lockedToken := c.lockTokenSequence
+		c.lockTokenSequence++
+		message.SetReference(lockedToken)
 
-	return message, err
+		// Add messages to locked messages list
+		now := time.Now().Add(waitTimeout)
+		lockedMessage := &LockedMessage{
+			ExpirationTime: now,
+			Message:        message,
+			Timeout:        waitTimeout,
+		}
+		c.lockedMessages[lockedToken] = lockedMessage
+
+		messageReceived = true
+		c.Lock.Unlock()
+	}
+
+	if message != nil {
+		c.Counters.IncrementOne("queue." + c.GetName() + ".received_messages")
+		c.Logger.Debug(message.CorrelationId, "Received message %s via %s", message, c.String())
+	}
+
+	return message, nil
 }
 
 // RenewLock method are renews a lock on a message that makes it invisible from other receivers in the queue.
@@ -223,28 +234,27 @@ func (c *MemoryMessageQueue) Receive(correlationId string, waitTimeout time.Dura
 //   - lockTimeout   a locking timeout in milliseconds.
 // Returns:  error or nil for success.
 func (c *MemoryMessageQueue) RenewLock(message *MessageEnvelope, lockTimeout time.Duration) (err error) {
-
 	reference := message.GetReference()
 	if reference == nil {
 		return nil
 	}
+
+	c.Lock.Lock()
 	// Get message from locked queue
-	lockedToken, ok := reference.(int)
-	if !ok {
-		return nil
-	}
+	lockedToken := reference.(int)
 	lockedMessage, ok := c.lockedMessages[lockedToken]
 	// If lock is found, extend the lock
 	if ok {
-		var now time.Time = time.Now()
+		now := time.Now()
 		// Todo: Shall we skip if the message already expired?
-		if lockedMessage.ExpirationTime.Unix() > now.Unix() {
-			now = now.Add(lockedMessage.Timeout)
-			lockedMessage.ExpirationTime = now
+		if lockedMessage.ExpirationTime.After(now) {
+			lockedMessage.ExpirationTime = now.Add(lockedMessage.Timeout)
 		}
 	}
+	c.Lock.Unlock()
 
-	c.Logger.Trace(message.Correlation_id, "Renewed lock for message %s at %s", message, c.ToString())
+	c.Logger.Trace(message.CorrelationId, "Renewed lock for message %s at %s", message, c.String())
+
 	return nil
 }
 
@@ -253,19 +263,19 @@ func (c *MemoryMessageQueue) RenewLock(message *MessageEnvelope, lockTimeout tim
 //   - message   a message to remove.
 // Returns: error or nil for success.
 func (c *MemoryMessageQueue) Complete(message *MessageEnvelope) (err error) {
-
 	reference := message.GetReference()
 	if reference == nil {
 		return nil
 	}
 
-	lockKey, ok := reference.(int)
-	if !ok {
-		return nil
-	}
-	delete(c.lockedMessages, lockKey)
+	c.Lock.Lock()
+	lockedToken := reference.(int)
+	delete(c.lockedMessages, lockedToken)
 	message.SetReference(nil)
-	c.Logger.Trace(message.Correlation_id, "Completed message %s at %s", message, c.ToString())
+	c.Lock.Unlock()
+
+	c.Logger.Trace(message.CorrelationId, "Completed message %s at %s", message, c.String())
+
 	return nil
 }
 
@@ -276,31 +286,35 @@ func (c *MemoryMessageQueue) Complete(message *MessageEnvelope) (err error) {
 //   - message   a message to return.
 // Returns: error or nil for success.
 func (c *MemoryMessageQueue) Abandon(message *MessageEnvelope) (err error) {
-
 	reference := message.GetReference()
 	if reference == nil {
 		return nil
 	}
 
+	c.Lock.Lock()
 	// Get message from locked queue
-	lockedToken, ok := reference.(int)
-	if !ok {
-		return nil
-	}
+	lockedToken := reference.(int)
 	lockedMessage, ok := c.lockedMessages[lockedToken]
 	if ok {
 		// Remove from locked messages
 		delete(c.lockedMessages, lockedToken)
 		message.SetReference(nil)
+
 		// Skip if it is already expired
-		if lockedMessage.ExpirationTime.Unix() <= time.Now().Unix() {
+		if lockedMessage.ExpirationTime.Before(time.Now()) {
+			c.Lock.Unlock()
 			return nil
 		}
 	} else { // Skip if it absent
+		c.Lock.Unlock()
 		return nil
 	}
-	c.Logger.Trace(message.Correlation_id, "Abandoned message %s at %s", message, c.ToString())
-	return c.Send(message.Correlation_id, message)
+	c.Lock.Unlock()
+
+	c.Logger.Trace(message.CorrelationId, "Abandoned message %s at %s", message, c.String())
+
+	// Add back to message queue
+	return c.Send(message.CorrelationId, message)
 }
 
 // MoveToDeadLetter method are permanently removes a message from the queue and sends it to dead letter queue.
@@ -312,15 +326,15 @@ func (c *MemoryMessageQueue) MoveToDeadLetter(message *MessageEnvelope) (err err
 		return nil
 	}
 
-	lockedToken, ok := reference.(int)
-	if !ok {
-		return nil
-	}
-
+	c.Lock.Lock()
+	lockedToken := reference.(int)
 	delete(c.lockedMessages, lockedToken)
 	message.SetReference(nil)
-	c.Counters.IncrementOne("queue." + c.GetName() + ".deadmessages")
-	c.Logger.Trace(message.Correlation_id, "Moved to dead message %s at %s", message, c.ToString())
+	c.Lock.Unlock()
+
+	c.Counters.IncrementOne("queue." + c.GetName() + ".dead_messages")
+	c.Logger.Trace(message.CorrelationId, "Moved to dead message %s at %s", message, c.String())
+
 	return nil
 }
 
@@ -329,50 +343,42 @@ func (c *MemoryMessageQueue) MoveToDeadLetter(message *MessageEnvelope) (err err
 //   - receiver          a receiver to receive incoming messages.
 // See IMessageReceiver
 // See Receive
-func (c *MemoryMessageQueue) Listen(correlationId string, receiver IMessageReceiver) {
+func (c *MemoryMessageQueue) Listen(correlationId string, receiver IMessageReceiver) error {
+	c.Logger.Trace("", "Started listening messages at %s", c.String())
 
-	var timeoutInterval time.Duration = 1000 * time.Millisecond
-	c.Logger.Trace("", "Started listening messages at %s", c.ToString())
-	c.cancel = false
+	// Unset cancellation token
+	atomic.StoreInt32(&c.cancel, 0)
 
-	go func() {
-		for !c.cancel {
-
-			var message *MessageEnvelope
-
-			wg := sync.WaitGroup{}
-			wg.Add(1)
-			go func() {
-				result, err := c.Receive(correlationId, timeoutInterval)
-				message = result
-				if err != nil {
-					c.Logger.Error(correlationId, err, "Failed to receive the message")
-				}
-				wg.Done()
-			}()
-			wg.Wait()
-			wg.Add(1)
-			go func() {
-				if message != nil && !c.cancel {
-					err := receiver.ReceiveMessage(message, c)
-					if err != nil {
-						c.Logger.Error(correlationId, err, "Failed to process the message")
-					}
-					wg.Done()
-				}
-			}()
-			wg.Wait()
-			select {
-			case <-time.After(timeoutInterval):
-			}
+	for atomic.LoadInt32(&c.cancel) == 0 {
+		message, err := c.Receive(correlationId, time.Duration(1000)*time.Millisecond)
+		if err != nil {
+			c.Logger.Error(correlationId, err, "Failed to receive the message")
 		}
 
-	}()
+		if message != nil && atomic.LoadInt32(&c.cancel) == 0 {
+			// Todo: shall we recover after panic here??
+			func(message *MessageEnvelope) {
+				defer func() {
+					if r := recover(); r != nil {
+						err := fmt.Sprintf("%v", r)
+						c.Logger.Error(correlationId, nil, "Failed to process the message - "+err)
+					}
+				}()
+
+				err = receiver.ReceiveMessage(message, c)
+				if err != nil {
+					c.Logger.Error(correlationId, err, "Failed to process the message")
+				}
+			}(message)
+		}
+	}
+
+	return nil
 }
 
 // EndListen method are ends listening for incoming messages.
 // When c method is call listen unblocks the thread and execution continues.
 //   - correlationId     (optional) transaction id to trace execution through call chain.
 func (c *MemoryMessageQueue) EndListen(correlationId string) {
-	c.cancel = true
+	atomic.StoreInt32(&c.cancel, 1)
 }

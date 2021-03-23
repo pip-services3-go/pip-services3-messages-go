@@ -4,12 +4,24 @@ import (
 	"sync"
 
 	cconf "github.com/pip-services3-go/pip-services3-commons-go/config"
+	cerr "github.com/pip-services3-go/pip-services3-commons-go/errors"
 	cref "github.com/pip-services3-go/pip-services3-commons-go/refer"
-	"github.com/pip-services3-go/pip-services3-components-go/auth"
+	cauth "github.com/pip-services3-go/pip-services3-components-go/auth"
 	ccon "github.com/pip-services3-go/pip-services3-components-go/connect"
 	ccount "github.com/pip-services3-go/pip-services3-components-go/count"
 	clog "github.com/pip-services3-go/pip-services3-components-go/log"
 )
+
+type IMessageQueueOverrides interface {
+	IMessageQueue
+
+	// OpenWithParams method are opens the component with given connection and credential parameters.
+	//  - correlationId     (optional) transaction id to trace execution through call chain.
+	//  - connections        connection parameters
+	//  - credential        credential parameters
+	// Returns error or nil no errors occured.
+	OpenWithParams(correlationId string, connections []*ccon.ConnectionParams, credential *cauth.CredentialParams) error
+}
 
 /*
 MessageQueue message queue that is used as a basis for specific message queue implementations.
@@ -38,33 +50,42 @@ References:
 - *:credential-store:*:*:1.0 (optional)  ICredentialStore componetns to lookup credential(s)
 */
 type MessageQueue struct {
-	IMessageQueue
+	IMessageQueueOverrides
 	Logger             *clog.CompositeLogger
 	Counters           *ccount.CompositeCounters
 	ConnectionResolver *ccon.ConnectionResolver
-	CredentialResolver *auth.CredentialResolver
+	CredentialResolver *cauth.CredentialResolver
 	Name               string
 	Capabilities       *MessagingCapabilities
+	Lock               sync.Mutex
 }
 
 // NewMessageQueue method are creates a new instance of the message queue.
+//   - overrides a message queue overrides
 //   - name  (optional) a queue name
-func NewMessageQueue(name string) *MessageQueue {
-	c := MessageQueue{Name: name}
+func InheritMessageQueue(overrides IMessageQueueOverrides, name string) *MessageQueue {
+	c := MessageQueue{
+		IMessageQueueOverrides: overrides,
+		Name:                   name,
+	}
 	c.Logger = clog.NewCompositeLogger()
 	c.Counters = ccount.NewCompositeCounters()
 	c.ConnectionResolver = ccon.NewEmptyConnectionResolver()
-	c.CredentialResolver = auth.NewEmptyCredentialResolver()
+	c.CredentialResolver = cauth.NewEmptyCredentialResolver()
 	return &c
 }
 
 // GetName method are gets the queue name
 // Return the queue name.
-func (c *MessageQueue) GetName() string { return c.Name }
+func (c *MessageQueue) GetName() string {
+	return c.Name
+}
 
 // GetCapabilities method are gets the queue capabilities
 // Return the queue's capabilities object.
-func (c *MessageQueue) GetCapabilities() MessagingCapabilities { return *c.Capabilities }
+func (c *MessageQueue) GetCapabilities() MessagingCapabilities {
+	return *c.Capabilities
+}
 
 // Configure method are configures component by passing configuration parameters.
 //   - config    configuration parameters to be set.
@@ -87,36 +108,22 @@ func (c *MessageQueue) SetReferences(references cref.IReferences) {
 // Open method are opens the component.
 //   - correlationId 	(optional) transaction id to trace execution through call chain.
 // Returns: error or null no errors occured.
-func (c *MessageQueue) Open(correlationId string) (err error) {
-	var connection *ccon.ConnectionParams
-	var credential *auth.CredentialParams
-
-	wg := sync.WaitGroup{}
-	var conErr, credErr error
-
-	wg.Add(2)
-	go func() {
-		result, err := c.ConnectionResolver.Resolve(correlationId)
-		connection = result
-		conErr = err
-		wg.Done()
-	}()
-
-	go func() {
-		result, err := c.CredentialResolver.Lookup(correlationId)
-		credential = result
-		credErr = err
-		wg.Done()
-	}()
-	wg.Wait()
-	if conErr != nil {
-		return conErr
+func (c *MessageQueue) Open(correlationId string) error {
+	connections, err := c.ConnectionResolver.ResolveAll(correlationId)
+	if err != nil {
+		return err
 	}
-	if credErr != nil {
-		return credErr
+	if len(connections) == 0 {
+		err = cerr.NewConfigError(correlationId, "NO_CONNECTION", "Connection parameters are not set")
+		return err
 	}
 
-	return c.OpenWithParams(correlationId, connection, credential)
+	credential, err := c.CredentialResolver.Lookup(correlationId)
+	if err != nil {
+		return err
+	}
+
+	return c.OpenWithParams(correlationId, connections, credential)
 }
 
 // SendAsObject method are sends an object into the queue.
@@ -127,7 +134,7 @@ func (c *MessageQueue) Open(correlationId string) (err error) {
 // Returns: error or null for success.
 // See Send
 func (c *MessageQueue) SendAsObject(correlationId string, messageType string, message interface{}) (err error) {
-	envelope := NewMessageEnvelope(correlationId, messageType, "")
+	envelope := NewMessageEnvelope(correlationId, messageType, nil)
 	envelope.SetMessageAsJson(message)
 	return c.Send(correlationId, envelope)
 }
@@ -139,12 +146,15 @@ func (c *MessageQueue) SendAsObject(correlationId string, messageType string, me
 // See IMessageReceiver
 func (c *MessageQueue) BeginListen(correlationId string, receiver IMessageReceiver) {
 	go func() {
-		c.Listen(correlationId, receiver)
+		err := c.Listen(correlationId, receiver)
+		if err != nil {
+			c.Logger.Error(correlationId, err, "Failed to listed the message queue "+c.Name)
+		}
 	}()
 }
 
-// ToString method are gets a string representation of the object.
+// String method are gets a string representation of the object.
 // Return a string representation of the object.
-func (c *MessageQueue) ToString() string {
+func (c *MessageQueue) String() string {
 	return "[" + c.GetName() + "]"
 }

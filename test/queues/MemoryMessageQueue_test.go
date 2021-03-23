@@ -7,16 +7,11 @@ import (
 )
 
 func TestMemoryMessageQueue(t *testing.T) {
+	queue := queues.NewMemoryMessageQueue("TestQueue")
+	fixture := NewMessageQueueFixture(queue)
 
-	var queue *queues.MemoryMessageQueue
-	var fixture *MessageQueueFixture
-
-	queue = queues.NewMemoryMessageQueue("TestQueue")
-	fixture = NewMessageQueueFixture(queue)
 	queue.Open("")
-
 	defer queue.Close("")
-
 	queue.Clear("")
 
 	t.Run("MemoryMessageQueue:Send Receive Message", fixture.TestSendReceiveMessage)

@@ -2,6 +2,7 @@ package queues
 
 import (
 	"encoding/json"
+	"strings"
 	"time"
 
 	cdata "github.com/pip-services3-go/pip-services3-commons-go/data"
@@ -17,15 +18,22 @@ type MessageEnvelope struct {
 	reference interface{}
 
 	//The unique business transaction id that is used to trace calls across components.
-	Correlation_id string
+	CorrelationId string `json:"correlation_id"`
 	// The message"s auto-generated ID.
-	Message_id string
+	MessageId string `json:"message_id"`
 	// String value that defines the stored message"s type.
-	Message_type string
+	MessageType string `json:"message_type"`
 	// The time at which the message was sent.
-	Sent_time time.Time
+	SentTime time.Time `json:"sent_time"`
 	//The stored message.
-	Message string
+	Message []byte `json:"message"`
+}
+
+// NewMessageEnvelope method are creates an empty MessageEnvelope
+// Returns: *MessageEnvelope new instance
+func NewEmptyMessageEnvelope() *MessageEnvelope {
+	c := MessageEnvelope{}
+	return &c
 }
 
 // NewMessageEnvelope method are creates a new MessageEnvelope, which adds a correlation id, message id, and a type to the
@@ -34,16 +42,16 @@ type MessageEnvelope struct {
 //   - messageType       a string value that defines the message"s type.
 //   - message           the data being sent/received.
 // Returns: *MessageEnvelope new instance
-func NewMessageEnvelope(correlationId string, messageType string, message string) *MessageEnvelope {
-	me := MessageEnvelope{}
-	me.Correlation_id = correlationId
-	me.Message_type = messageType
-	me.Message = message
-	me.Message_id = cdata.IdGenerator.NextLong()
-	return &me
+func NewMessageEnvelope(correlationId string, messageType string, message []byte) *MessageEnvelope {
+	c := MessageEnvelope{}
+	c.CorrelationId = correlationId
+	c.MessageType = messageType
+	c.MessageId = cdata.IdGenerator.NextLong()
+	c.Message = message
+	return &c
 }
 
-//GetReference method are returns the lock token that this MessageEnvelope references.
+// GetReference method are returns the lock token that this MessageEnvelope references.
 func (c *MessageEnvelope) GetReference() interface{} {
 	return c.reference
 }
@@ -56,27 +64,28 @@ func (c *MessageEnvelope) SetReference(value interface{}) {
 
 // GetMessageAsString method are returns the information stored in this message as a string.
 func (c *MessageEnvelope) GetMessageAsString() string {
-	return c.Message
+	return string(c.Message)
 }
 
 // SetMessageAsString method are stores the given string.
 //   - value    the string to set. Will be converted to a bufferg.
 func (c *MessageEnvelope) SetMessageAsString(value string) {
-	c.Message = value
+	c.Message = []byte(value)
 }
 
 // GetMessageAsJson method are returns the value that was stored in this message as a JSON string.
 // See  SetMessageAsJson
 func (c *MessageEnvelope) GetMessageAsJson() interface{} {
-	if c.Message == "" {
+	if c.Message == nil {
 		return nil
 	}
-	temp := []byte(c.Message)
+
 	var result interface{}
-	umErr := json.Unmarshal(temp, &result)
-	if umErr != nil {
+	err := json.Unmarshal(c.Message, &result)
+	if err != nil {
 		return nil
 	}
+
 	return result
 }
 
@@ -85,38 +94,39 @@ func (c *MessageEnvelope) GetMessageAsJson() interface{} {
 // See  GetMessageAsJson
 func (c *MessageEnvelope) SetMessageAsJson(value interface{}) {
 	if value == nil {
-		c.Message = ""
+		c.Message = []byte{}
 	} else {
-		temp, mErr := json.Marshal(value)
-		if mErr == nil {
-			c.Message = string(temp)
+		message, err := json.Marshal(value)
+		if err == nil {
+			c.Message = message
 		}
 	}
 }
 
-// ToString method are convert"s this MessageEnvelope to a string, using the following format:
-// <correlation_id>,<Message_type>,<message.toString>
+// String method are convert"s this MessageEnvelope to a string, using the following format:
+// <correlation_id>,<MessageType>,<message.toString>
 // If any of the values are nil, they will be replaced with ---.
 // Returns the generated string.
-func (c *MessageEnvelope) ToString() string {
-	builder := "["
-	if c.Correlation_id == "" {
-		builder += "---"
+func (c *MessageEnvelope) String() string {
+	builder := strings.Builder{}
+	builder.WriteString("[")
+	if c.CorrelationId == "" {
+		builder.WriteString("---")
 	} else {
-		builder += c.Correlation_id
+		builder.WriteString(c.CorrelationId)
 	}
-	builder += ","
-	if c.Message_type == "" {
-		builder += "---"
+	builder.WriteString(",")
+	if c.MessageType == "" {
+		builder.WriteString("---")
 	} else {
-		builder += c.Message_type
+		builder.WriteString(c.MessageType)
 	}
-	builder += ","
-	if c.Message == "" {
-		builder += "---"
+	builder.WriteString(",")
+	if c.Message == nil {
+		builder.WriteString("---")
 	} else {
-		builder += c.Message
+		builder.Write(c.Message)
 	}
-	builder += "]"
-	return builder
+	builder.WriteString("]")
+	return builder.String()
 }

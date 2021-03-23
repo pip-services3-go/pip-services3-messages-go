@@ -18,7 +18,7 @@ docker rmi -f $(docker images -f "dangling=true" -q) # remove build container if
 
 # Remove existed containers
 $exitedContainers = docker ps -a | Select-String -Pattern "Exit"
-foreach($c in $exitedContainers) { docker rm $c.ToString().Split(" ")[0] }
+foreach($c in $exitedContainers) { docker rm $c.String().Split(" ")[0] }
 
 # Remove unused volumes
 docker volume rm -f $(docker volume ls -f "dangling=true")
