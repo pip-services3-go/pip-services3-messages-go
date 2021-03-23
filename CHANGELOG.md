@@ -8,6 +8,7 @@ Improved message queuues
 * **queues** Added CallbackMessageReceiver to wrap callbacks into IMessageReceiver interface
 * **queues** Addded IMessageConnection interface
 * **build** Set config params and references to created queues in MessageQueueFactory
+* **queues** Added CheckOpen method to MessageQueue
 
 ## <a name="1.0.0"></a> 1.0.0 (2020-03-05)
 

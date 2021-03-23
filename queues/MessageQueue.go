@@ -126,6 +126,21 @@ func (c *MessageQueue) Open(correlationId string) error {
 	return c.OpenWithParams(correlationId, connections, credential)
 }
 
+// Checks if message queue has been opened
+//   - correlationId     (optional) transaction id to trace execution through call chain.
+// Returns: error or null for success.
+func (c *MessageQueue) CheckOpen(correlationId string) error {
+	if !c.IsOpen() {
+		err := cerr.NewInvalidStateError(
+			correlationId,
+			"NOT_OPENED",
+			"The queue is not opened",
+		)
+		return err
+	}
+	return nil
+}
+
 // SendAsObject method are sends an object into the queue.
 // Before sending the object is converted into JSON string and wrapped in a MessageEnvelop.
 //   - correlationId     (optional) transaction id to trace execution through call chain.
