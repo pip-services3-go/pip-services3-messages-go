@@ -7,7 +7,7 @@ import (
 	cerr "github.com/pip-services3-go/pip-services3-commons-go/errors"
 	cref "github.com/pip-services3-go/pip-services3-commons-go/refer"
 	cauth "github.com/pip-services3-go/pip-services3-components-go/auth"
-	ccon "github.com/pip-services3-go/pip-services3-components-go/connect"
+	cconn "github.com/pip-services3-go/pip-services3-components-go/connect"
 	ccount "github.com/pip-services3-go/pip-services3-components-go/count"
 	clog "github.com/pip-services3-go/pip-services3-components-go/log"
 )
@@ -20,7 +20,7 @@ type IMessageQueueOverrides interface {
 	//  - connections        connection parameters
 	//  - credential        credential parameters
 	// Returns error or nil no errors occured.
-	OpenWithParams(correlationId string, connections []*ccon.ConnectionParams, credential *cauth.CredentialParams) error
+	OpenWithParams(correlationId string, connections []*cconn.ConnectionParams, credential *cauth.CredentialParams) error
 }
 
 /*
@@ -53,7 +53,7 @@ type MessageQueue struct {
 	Overrides          IMessageQueueOverrides
 	Logger             *clog.CompositeLogger
 	Counters           *ccount.CompositeCounters
-	ConnectionResolver *ccon.ConnectionResolver
+	ConnectionResolver *cconn.ConnectionResolver
 	CredentialResolver *cauth.CredentialResolver
 	Lock               sync.Mutex
 	name               string
@@ -72,7 +72,7 @@ func InheritMessageQueue(overrides IMessageQueueOverrides, name string, capabili
 	}
 	c.Logger = clog.NewCompositeLogger()
 	c.Counters = ccount.NewCompositeCounters()
-	c.ConnectionResolver = ccon.NewEmptyConnectionResolver()
+	c.ConnectionResolver = cconn.NewEmptyConnectionResolver()
 	c.CredentialResolver = cauth.NewEmptyCredentialResolver()
 
 	if c.capabilities == nil {
@@ -133,6 +133,16 @@ func (c *MessageQueue) Open(correlationId string) error {
 	}
 
 	return c.Overrides.OpenWithParams(correlationId, connections, credential)
+}
+
+// OpenWithParams method are opens the component with given connection and credential parameters.
+//  - correlationId     (optional) transaction id to trace execution through call chain.
+//  - connections        connection parameters
+//  - credential        credential parameters
+// Returns error or nil no errors occured.
+func (c *MessageQueue) OpenWithParams(correlationId string, connections []*cconn.ConnectionParams,
+	credential *cauth.CredentialParams) error {
+	panic("Not supported")
 }
 
 // Checks if message queue has been opened

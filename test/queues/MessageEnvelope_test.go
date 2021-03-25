@@ -28,6 +28,7 @@ func (c *messageEnvelopeTest) TestSerializeMessage(t *testing.T) {
 
 	message2 := queues.NewEmptyMessageEnvelope()
 	err = json.Unmarshal(buffer, message2)
+	assert.Nil(t, err)
 	assert.Equal(t, message.MessageId, message2.MessageId)
 	assert.Equal(t, message.CorrelationId, message2.CorrelationId)
 	assert.Equal(t, message.MessageType, message2.MessageType)

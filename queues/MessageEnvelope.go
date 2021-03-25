@@ -1,10 +1,12 @@
 package queues
 
 import (
+	"encoding/base64"
 	"encoding/json"
 	"strings"
 	"time"
 
+	cconv "github.com/pip-services3-go/pip-services3-commons-go/convert"
 	cdata "github.com/pip-services3-go/pip-services3-commons-go/data"
 )
 
@@ -129,4 +131,51 @@ func (c *MessageEnvelope) String() string {
 	}
 	builder.WriteString("]")
 	return builder.String()
+}
+
+func (c *MessageEnvelope) MarshalJSON() ([]byte, error) {
+	jsonData := map[string]interface{}{
+		"message_id":     c.MessageId,
+		"correlation_id": c.CorrelationId,
+		"message_type":   c.MessageType,
+	}
+
+	if !c.SentTime.IsZero() {
+		jsonData["sent_time"] = c.SentTime
+	} else {
+		jsonData["sent_time"] = time.Now()
+	}
+
+	if c.Message != nil {
+		base64Text := make([]byte, base64.StdEncoding.EncodedLen(len(c.Message)))
+		base64.StdEncoding.Encode(base64Text, []byte(c.Message))
+		jsonData["message"] = string(base64Text)
+	}
+
+	return json.Marshal(jsonData)
+}
+
+func (c *MessageEnvelope) UnmarshalJSON(data []byte) error {
+	var jsonData map[string]interface{}
+	err := json.Unmarshal(data, &jsonData)
+	if err != nil {
+		return err
+	}
+
+	c.MessageId = jsonData["message_id"].(string)
+	c.CorrelationId = jsonData["correlation_id"].(string)
+	c.MessageType = jsonData["message_type"].(string)
+	c.SentTime = cconv.DateTimeConverter.ToDateTime(jsonData["sent_time"])
+
+	base64Text, ok := jsonData["message"].(string)
+	if ok && base64Text != "" {
+		data := make([]byte, base64.StdEncoding.DecodedLen(len(base64Text)))
+		len, err := base64.StdEncoding.Decode(data, []byte(base64Text))
+		if err != nil {
+			return err
+		}
+		c.Message = data[:len]
+	}
+
+	return nil
 }
