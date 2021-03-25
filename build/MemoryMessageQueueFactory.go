@@ -30,18 +30,25 @@ func NewMemoryMessageQueueFactory() *MemoryMessageQueueFactory {
 		if ok {
 			name = descriptor.Name()
 		}
-
-		queue := queues.NewMemoryMessageQueue(name)
-
-		if c.config != nil {
-			queue.Configure(c.config)
-		}
-		if c.references != nil {
-			queue.SetReferences(c.references)
-		}
-
-		return queue
+		return c.CreateQueue(name)
 	})
 
 	return &c
+}
+
+// Creates a message queue component and assigns its name.
+//
+// Parameters:
+//   - name: a name of the created message queue.
+func (c *MemoryMessageQueueFactory) CreateQueue(name string) queues.IMessageQueue {
+	queue := queues.NewMemoryMessageQueue(name)
+
+	if c.config != nil {
+		queue.Configure(c.config)
+	}
+	if c.references != nil {
+		queue.SetReferences(c.references)
+	}
+
+	return queue
 }

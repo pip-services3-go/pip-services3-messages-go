@@ -10,6 +10,7 @@ Improved message queues
 * **build** Set config params and references to created queues in MessageQueueFactory
 * **queues** Added CheckOpen method to MessageQueue
 * **queues** Added JSON serialization for MessageEnvelop
+* **build** Added IMessageQueueFactory interface
 
 ## <a name="1.0.0"></a> 1.0.0 (2020-03-05)
 

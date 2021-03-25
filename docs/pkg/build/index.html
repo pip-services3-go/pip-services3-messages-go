@@ -121,11 +121,19 @@
 				
 			
 				
+				<dd><a href="index.html#IMessageQueueFactory">type IMessageQueueFactory</a></dd>
+				
+				
+			
+				
 				<dd><a href="index.html#MemoryMessageQueueFactory">type MemoryMessageQueueFactory</a></dd>
 				
 					
 					<dd>&nbsp; &nbsp; <a href="index.html#NewMemoryMessageQueueFactory">func NewMemoryMessageQueueFactory() *MemoryMessageQueueFactory</a></dd>
 				
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#MemoryMessageQueueFactory.CreateQueue">func (c *MemoryMessageQueueFactory) CreateQueue(name string) queues.IMessageQueue</a></dd>
 				
 			
 			
@@ -140,6 +148,8 @@
 			<span style="font-size:90%">
 			
 				<a href="http://localhost:6060/src/build/DefaultMessagingFactory.go">DefaultMessagingFactory.go</a>
+			
+				<a href="http://localhost:6060/src/build/IMessageQueueFactory.go">IMessageQueueFactory.go</a>
 			
 				<a href="http://localhost:6060/src/build/MemoryMessageQueueFactory.go">MemoryMessageQueueFactory.go</a>
 			
@@ -204,6 +214,36 @@ NewDefaultMessagingFactory are create a new instance of the factory.
 		
 			
 			
+			<h2 id="IMessageQueueFactory">type <a href="http://localhost:6060/src/build/IMessageQueueFactory.go?s=128:341#L1">IMessageQueueFactory</a>
+				<a class="permalink" href="index.html#IMessageQueueFactory">&#xb6;</a>
+				
+				
+			</h2>
+			<p>
+Creates message queue componens.
+</p>
+
+			<pre>type IMessageQueueFactory interface {
+    <span class="comment">// Creates a message queue component and assigns its name.</span>
+    <span class="comment">// Parameters:</span>
+    <span class="comment">//   - name: a name of the created message queue.</span>
+    CreateQueue(name <a href="http://localhost:6060/pkg/builtin/#string">string</a>) <a href="http://localhost:6060/pkg/github.com/pip-services3-go/pip-services3-messaging-go/queues/">queues</a>.<a href="http://localhost:6060/pkg/github.com/pip-services3-go/pip-services3-messaging-go/queues/#IMessageQueue">IMessageQueue</a>
+}</pre>
+
+			
+
+			
+
+			
+			
+			
+
+			
+
+			
+		
+			
+			
 			<h2 id="MemoryMessageQueueFactory">type <a href="http://localhost:6060/src/build/MemoryMessageQueueFactory.go?s=505:622#L5">MemoryMessageQueueFactory</a>
 				<a class="permalink" href="index.html#MemoryMessageQueueFactory">&#xb6;</a>
 				
@@ -248,6 +288,26 @@ NewMemoryMessageQueueFactory method are create a new instance of the factory.
 				
 			
 
+			
+				
+				<h3 id="MemoryMessageQueueFactory.CreateQueue">func (*MemoryMessageQueueFactory) <a href="http://localhost:6060/src/build/MemoryMessageQueueFactory.go?s=1258:1339#L33">CreateQueue</a>
+					<a class="permalink" href="index.html#MemoryMessageQueueFactory.CreateQueue">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (c *<a href="index.html#MemoryMessageQueueFactory">MemoryMessageQueueFactory</a>) CreateQueue(name <a href="http://localhost:6060/pkg/builtin/#string">string</a>) <a href="http://localhost:6060/pkg/github.com/pip-services3-go/pip-services3-messaging-go/queues/">queues</a>.<a href="http://localhost:6060/pkg/github.com/pip-services3-go/pip-services3-messaging-go/queues/#IMessageQueue">IMessageQueue</a></pre>
+				<p>
+Creates a message queue component and assigns its name.
+</p>
+<p>
+Parameters:
+</p>
+<pre>- name: a name of the created message queue.
+</pre>
+
+				
+				
+				
 			
 		
 	

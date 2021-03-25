@@ -216,6 +216,9 @@
 					<dd>&nbsp; &nbsp; <a href="index.html#MessageEnvelope.GetReference">func (c *MessageEnvelope) GetReference() interface{}</a></dd>
 				
 					
+					<dd>&nbsp; &nbsp; <a href="index.html#MessageEnvelope.MarshalJSON">func (c *MessageEnvelope) MarshalJSON() ([]byte, error)</a></dd>
+				
+					
 					<dd>&nbsp; &nbsp; <a href="index.html#MessageEnvelope.SetMessageAsJson">func (c *MessageEnvelope) SetMessageAsJson(value interface{})</a></dd>
 				
 					
@@ -226,6 +229,9 @@
 				
 					
 					<dd>&nbsp; &nbsp; <a href="index.html#MessageEnvelope.String">func (c *MessageEnvelope) String() string</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#MessageEnvelope.UnmarshalJSON">func (c *MessageEnvelope) UnmarshalJSON(data []byte) error</a></dd>
 				
 			
 				
@@ -252,6 +258,9 @@
 				
 					
 					<dd>&nbsp; &nbsp; <a href="index.html#MessageQueue.Open">func (c *MessageQueue) Open(correlationId string) error</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#MessageQueue.OpenWithParams">func (c *MessageQueue) OpenWithParams(correlationId string, connections []*cconn.ConnectionParams, credential *cauth.CredentialParams) error</a></dd>
 				
 					
 					<dd>&nbsp; &nbsp; <a href="index.html#MessageQueue.SendAsObject">func (c *MessageQueue) SendAsObject(correlationId string, messageType string, message interface{}) (err error)</a></dd>
@@ -517,7 +526,7 @@ See MessagingCapabilities
 		
 			
 			
-			<h2 id="IMessageQueueOverrides">type <a href="http://localhost:6060/src/queues/MessageQueue.go?s=523:1026#L5">IMessageQueueOverrides</a>
+			<h2 id="IMessageQueueOverrides">type <a href="http://localhost:6060/src/queues/MessageQueue.go?s=524:1028#L5">IMessageQueueOverrides</a>
 				<a class="permalink" href="index.html#IMessageQueueOverrides">&#xb6;</a>
 				
 				
@@ -531,7 +540,7 @@ See MessagingCapabilities
     <span class="comment">//  - connections        connection parameters</span>
     <span class="comment">//  - credential        credential parameters</span>
     <span class="comment">// Returns error or nil no errors occured.</span>
-    OpenWithParams(correlationId <a href="http://localhost:6060/pkg/builtin/#string">string</a>, connections []*<a href="http://localhost:6060/pkg/github.com/pip-services3-go/pip-services3-components-go/connect/">ccon</a>.<a href="http://localhost:6060/pkg/github.com/pip-services3-go/pip-services3-components-go/connect/#ConnectionParams">ConnectionParams</a>, credential *<a href="http://localhost:6060/pkg/github.com/pip-services3-go/pip-services3-components-go/auth/">cauth</a>.<a href="http://localhost:6060/pkg/github.com/pip-services3-go/pip-services3-components-go/auth/#CredentialParams">CredentialParams</a>) <a href="http://localhost:6060/pkg/builtin/#error">error</a>
+    OpenWithParams(correlationId <a href="http://localhost:6060/pkg/builtin/#string">string</a>, connections []*<a href="http://localhost:6060/pkg/github.com/pip-services3-go/pip-services3-components-go/connect/">cconn</a>.<a href="http://localhost:6060/pkg/github.com/pip-services3-go/pip-services3-components-go/connect/#ConnectionParams">ConnectionParams</a>, credential *<a href="http://localhost:6060/pkg/github.com/pip-services3-go/pip-services3-components-go/auth/">cauth</a>.<a href="http://localhost:6060/pkg/github.com/pip-services3-go/pip-services3-components-go/auth/#CredentialParams">CredentialParams</a>) <a href="http://localhost:6060/pkg/builtin/#error">error</a>
 }</pre>
 
 			
@@ -1013,7 +1022,7 @@ Returns: error or nil for success.
 		
 			
 			
-			<h2 id="MessageEnvelope">type <a href="http://localhost:6060/src/queues/MessageEnvelope.go?s=467:966#L7">MessageEnvelope</a>
+			<h2 id="MessageEnvelope">type <a href="http://localhost:6060/src/queues/MessageEnvelope.go?s=556:1055#L9">MessageEnvelope</a>
 				<a class="permalink" href="index.html#MessageEnvelope">&#xb6;</a>
 				
 				
@@ -1051,7 +1060,7 @@ using utf8 conversions.
 
 			
 				
-				<h3 id="NewEmptyMessageEnvelope">func <a href="http://localhost:6060/src/queues/MessageEnvelope.go?s=1076:1123#L24">NewEmptyMessageEnvelope</a>
+				<h3 id="NewEmptyMessageEnvelope">func <a href="http://localhost:6060/src/queues/MessageEnvelope.go?s=1165:1212#L26">NewEmptyMessageEnvelope</a>
 					<a class="permalink" href="index.html#NewEmptyMessageEnvelope">&#xb6;</a>
 					
 					
@@ -1066,7 +1075,7 @@ Returns: *MessageEnvelope new instance
 				
 			
 				
-				<h3 id="NewMessageEnvelope">func <a href="http://localhost:6060/src/queues/MessageEnvelope.go?s=1576:1674#L35">NewMessageEnvelope</a>
+				<h3 id="NewMessageEnvelope">func <a href="http://localhost:6060/src/queues/MessageEnvelope.go?s=1665:1763#L37">NewMessageEnvelope</a>
 					<a class="permalink" href="index.html#NewMessageEnvelope">&#xb6;</a>
 					
 					
@@ -1090,7 +1099,7 @@ Returns: *MessageEnvelope new instance
 
 			
 				
-				<h3 id="MessageEnvelope.GetMessageAsJson">func (*MessageEnvelope) <a href="http://localhost:6060/src/queues/MessageEnvelope.go?s=2737:2793#L68">GetMessageAsJson</a>
+				<h3 id="MessageEnvelope.GetMessageAsJson">func (*MessageEnvelope) <a href="http://localhost:6060/src/queues/MessageEnvelope.go?s=2826:2882#L70">GetMessageAsJson</a>
 					<a class="permalink" href="index.html#MessageEnvelope.GetMessageAsJson">&#xb6;</a>
 					
 					
@@ -1106,7 +1115,7 @@ See  SetMessageAsJson
 				
 			
 				
-				<h3 id="MessageEnvelope.GetMessageAsString">func (*MessageEnvelope) <a href="http://localhost:6060/src/queues/MessageEnvelope.go?s=2312:2365#L56">GetMessageAsString</a>
+				<h3 id="MessageEnvelope.GetMessageAsString">func (*MessageEnvelope) <a href="http://localhost:6060/src/queues/MessageEnvelope.go?s=2401:2454#L58">GetMessageAsString</a>
 					<a class="permalink" href="index.html#MessageEnvelope.GetMessageAsString">&#xb6;</a>
 					
 					
@@ -1121,7 +1130,7 @@ GetMessageAsString method are returns the information stored in this message as 
 				
 			
 				
-				<h3 id="MessageEnvelope.GetReference">func (*MessageEnvelope) <a href="http://localhost:6060/src/queues/MessageEnvelope.go?s=1930:1982#L45">GetReference</a>
+				<h3 id="MessageEnvelope.GetReference">func (*MessageEnvelope) <a href="http://localhost:6060/src/queues/MessageEnvelope.go?s=2019:2071#L47">GetReference</a>
 					<a class="permalink" href="index.html#MessageEnvelope.GetReference">&#xb6;</a>
 					
 					
@@ -1136,7 +1145,19 @@ GetReference method are returns the lock token that this MessageEnvelope referen
 				
 			
 				
-				<h3 id="MessageEnvelope.SetMessageAsJson">func (*MessageEnvelope) <a href="http://localhost:6060/src/queues/MessageEnvelope.go?s=3125:3186#L85">SetMessageAsJson</a>
+				<h3 id="MessageEnvelope.MarshalJSON">func (*MessageEnvelope) <a href="http://localhost:6060/src/queues/MessageEnvelope.go?s=4175:4230#L126">MarshalJSON</a>
+					<a class="permalink" href="index.html#MessageEnvelope.MarshalJSON">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (c *<a href="index.html#MessageEnvelope">MessageEnvelope</a>) MarshalJSON() ([]<a href="http://localhost:6060/pkg/builtin/#byte">byte</a>, <a href="http://localhost:6060/pkg/builtin/#error">error</a>)</pre>
+				
+				
+				
+				
+			
+				
+				<h3 id="MessageEnvelope.SetMessageAsJson">func (*MessageEnvelope) <a href="http://localhost:6060/src/queues/MessageEnvelope.go?s=3214:3275#L87">SetMessageAsJson</a>
 					<a class="permalink" href="index.html#MessageEnvelope.SetMessageAsJson">&#xb6;</a>
 					
 					
@@ -1156,7 +1177,7 @@ See  GetMessageAsJson
 				
 			
 				
-				<h3 id="MessageEnvelope.SetMessageAsString">func (*MessageEnvelope) <a href="http://localhost:6060/src/queues/MessageEnvelope.go?s=2522:2580#L62">SetMessageAsString</a>
+				<h3 id="MessageEnvelope.SetMessageAsString">func (*MessageEnvelope) <a href="http://localhost:6060/src/queues/MessageEnvelope.go?s=2611:2669#L64">SetMessageAsString</a>
 					<a class="permalink" href="index.html#MessageEnvelope.SetMessageAsString">&#xb6;</a>
 					
 					
@@ -1173,7 +1194,7 @@ SetMessageAsString method are stores the given string.
 				
 			
 				
-				<h3 id="MessageEnvelope.SetReference">func (*MessageEnvelope) <a href="http://localhost:6060/src/queues/MessageEnvelope.go?s=2135:2192#L51">SetReference</a>
+				<h3 id="MessageEnvelope.SetReference">func (*MessageEnvelope) <a href="http://localhost:6060/src/queues/MessageEnvelope.go?s=2224:2281#L53">SetReference</a>
 					<a class="permalink" href="index.html#MessageEnvelope.SetReference">&#xb6;</a>
 					
 					
@@ -1190,7 +1211,7 @@ SetReference method are sets a lock token reference for this MessageEnvelope.
 				
 			
 				
-				<h3 id="MessageEnvelope.String">func (*MessageEnvelope) <a href="http://localhost:6060/src/queues/MessageEnvelope.go?s=3574:3615#L100">String</a>
+				<h3 id="MessageEnvelope.String">func (*MessageEnvelope) <a href="http://localhost:6060/src/queues/MessageEnvelope.go?s=3663:3704#L102">String</a>
 					<a class="permalink" href="index.html#MessageEnvelope.String">&#xb6;</a>
 					
 					
@@ -1207,10 +1228,22 @@ Returns the generated string.
 				
 				
 			
+				
+				<h3 id="MessageEnvelope.UnmarshalJSON">func (*MessageEnvelope) <a href="http://localhost:6060/src/queues/MessageEnvelope.go?s=4733:4791#L148">UnmarshalJSON</a>
+					<a class="permalink" href="index.html#MessageEnvelope.UnmarshalJSON">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (c *<a href="index.html#MessageEnvelope">MessageEnvelope</a>) UnmarshalJSON(data []<a href="http://localhost:6060/pkg/builtin/#byte">byte</a>) <a href="http://localhost:6060/pkg/builtin/#error">error</a></pre>
+				
+				
+				
+				
+			
 		
 			
 			
-			<h2 id="MessageQueue">type <a href="http://localhost:6060/src/queues/MessageQueue.go?s=2265:2616#L42">MessageQueue</a>
+			<h2 id="MessageQueue">type <a href="http://localhost:6060/src/queues/MessageQueue.go?s=2267:2619#L42">MessageQueue</a>
 				<a class="permalink" href="index.html#MessageQueue">&#xb6;</a>
 				
 				
@@ -1249,7 +1282,7 @@ References:
 <span id="MessageQueue.Overrides"></span>    Overrides          <a href="index.html#IMessageQueueOverrides">IMessageQueueOverrides</a>
 <span id="MessageQueue.Logger"></span>    Logger             *<a href="http://localhost:6060/pkg/github.com/pip-services3-go/pip-services3-components-go/log/">clog</a>.<a href="http://localhost:6060/pkg/github.com/pip-services3-go/pip-services3-components-go/log/#CompositeLogger">CompositeLogger</a>
 <span id="MessageQueue.Counters"></span>    Counters           *<a href="http://localhost:6060/pkg/github.com/pip-services3-go/pip-services3-components-go/count/">ccount</a>.<a href="http://localhost:6060/pkg/github.com/pip-services3-go/pip-services3-components-go/count/#CompositeCounters">CompositeCounters</a>
-<span id="MessageQueue.ConnectionResolver"></span>    ConnectionResolver *<a href="http://localhost:6060/pkg/github.com/pip-services3-go/pip-services3-components-go/connect/">ccon</a>.<a href="http://localhost:6060/pkg/github.com/pip-services3-go/pip-services3-components-go/connect/#ConnectionResolver">ConnectionResolver</a>
+<span id="MessageQueue.ConnectionResolver"></span>    ConnectionResolver *<a href="http://localhost:6060/pkg/github.com/pip-services3-go/pip-services3-components-go/connect/">cconn</a>.<a href="http://localhost:6060/pkg/github.com/pip-services3-go/pip-services3-components-go/connect/#ConnectionResolver">ConnectionResolver</a>
 <span id="MessageQueue.CredentialResolver"></span>    CredentialResolver *<a href="http://localhost:6060/pkg/github.com/pip-services3-go/pip-services3-components-go/auth/">cauth</a>.<a href="http://localhost:6060/pkg/github.com/pip-services3-go/pip-services3-components-go/auth/#CredentialResolver">CredentialResolver</a>
 <span id="MessageQueue.Lock"></span>    Lock               <a href="http://localhost:6060/pkg/sync/">sync</a>.<a href="http://localhost:6060/pkg/sync/#Mutex">Mutex</a>
     <span class="comment">// contains filtered or unexported fields</span>
@@ -1266,7 +1299,7 @@ References:
 
 			
 				
-				<h3 id="InheritMessageQueue">func <a href="http://localhost:6060/src/queues/MessageQueue.go?s=2839:2961#L57">InheritMessageQueue</a>
+				<h3 id="InheritMessageQueue">func <a href="http://localhost:6060/src/queues/MessageQueue.go?s=2842:2964#L57">InheritMessageQueue</a>
 					<a class="permalink" href="index.html#InheritMessageQueue">&#xb6;</a>
 					
 					
@@ -1286,7 +1319,7 @@ NewMessageQueue method are creates a new instance of the message queue.
 
 			
 				
-				<h3 id="MessageQueue.BeginListen">func (*MessageQueue) <a href="http://localhost:6060/src/queues/MessageQueue.go?s=6506:6589#L161">BeginListen</a>
+				<h3 id="MessageQueue.BeginListen">func (*MessageQueue) <a href="http://localhost:6060/src/queues/MessageQueue.go?s=7004:7087#L171">BeginListen</a>
 					<a class="permalink" href="index.html#MessageQueue.BeginListen">&#xb6;</a>
 					
 					
@@ -1308,7 +1341,7 @@ See IMessageReceiver
 				
 			
 				
-				<h3 id="MessageQueue.Capabilities">func (*MessageQueue) <a href="http://localhost:6060/src/queues/MessageQueue.go?s=3622:3682#L83">Capabilities</a>
+				<h3 id="MessageQueue.Capabilities">func (*MessageQueue) <a href="http://localhost:6060/src/queues/MessageQueue.go?s=3626:3686#L83">Capabilities</a>
 					<a class="permalink" href="index.html#MessageQueue.Capabilities">&#xb6;</a>
 					
 					
@@ -1324,7 +1357,7 @@ Return the queue&#39;s capabilities object.
 				
 			
 				
-				<h3 id="MessageQueue.CheckOpen">func (*MessageQueue) <a href="http://localhost:6060/src/queues/MessageQueue.go?s=5341:5401#L131">CheckOpen</a>
+				<h3 id="MessageQueue.CheckOpen">func (*MessageQueue) <a href="http://localhost:6060/src/queues/MessageQueue.go?s=5839:5899#L141">CheckOpen</a>
 					<a class="permalink" href="index.html#MessageQueue.CheckOpen">&#xb6;</a>
 					
 					
@@ -1344,7 +1377,7 @@ Returns: error or null for success.
 				
 			
 				
-				<h3 id="MessageQueue.Configure">func (*MessageQueue) <a href="http://localhost:6060/src/queues/MessageQueue.go?s=3846:3906#L89">Configure</a>
+				<h3 id="MessageQueue.Configure">func (*MessageQueue) <a href="http://localhost:6060/src/queues/MessageQueue.go?s=3850:3910#L89">Configure</a>
 					<a class="permalink" href="index.html#MessageQueue.Configure">&#xb6;</a>
 					
 					
@@ -1361,7 +1394,7 @@ Configure method are configures component by passing configuration parameters.
 				
 			
 				
-				<h3 id="MessageQueue.Name">func (*MessageQueue) <a href="http://localhost:6060/src/queues/MessageQueue.go?s=3467:3503#L77">Name</a>
+				<h3 id="MessageQueue.Name">func (*MessageQueue) <a href="http://localhost:6060/src/queues/MessageQueue.go?s=3471:3507#L77">Name</a>
 					<a class="permalink" href="index.html#MessageQueue.Name">&#xb6;</a>
 					
 					
@@ -1377,7 +1410,7 @@ Return the queue name.
 				
 			
 				
-				<h3 id="MessageQueue.Open">func (*MessageQueue) <a href="http://localhost:6060/src/queues/MessageQueue.go?s=4693:4748#L110">Open</a>
+				<h3 id="MessageQueue.Open">func (*MessageQueue) <a href="http://localhost:6060/src/queues/MessageQueue.go?s=4697:4752#L110">Open</a>
 					<a class="permalink" href="index.html#MessageQueue.Open">&#xb6;</a>
 					
 					
@@ -1397,7 +1430,30 @@ Returns: error or null no errors occured.
 				
 			
 				
-				<h3 id="MessageQueue.SendAsObject">func (*MessageQueue) <a href="http://localhost:6060/src/queues/MessageQueue.go?s=5952:6062#L150">SendAsObject</a>
+				<h3 id="MessageQueue.OpenWithParams">func (*MessageQueue) <a href="http://localhost:6060/src/queues/MessageQueue.go?s=5496:5637#L133">OpenWithParams</a>
+					<a class="permalink" href="index.html#MessageQueue.OpenWithParams">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (c *<a href="index.html#MessageQueue">MessageQueue</a>) OpenWithParams(correlationId <a href="http://localhost:6060/pkg/builtin/#string">string</a>, connections []*<a href="http://localhost:6060/pkg/github.com/pip-services3-go/pip-services3-components-go/connect/">cconn</a>.<a href="http://localhost:6060/pkg/github.com/pip-services3-go/pip-services3-components-go/connect/#ConnectionParams">ConnectionParams</a>,
+    credential *<a href="http://localhost:6060/pkg/github.com/pip-services3-go/pip-services3-components-go/auth/">cauth</a>.<a href="http://localhost:6060/pkg/github.com/pip-services3-go/pip-services3-components-go/auth/#CredentialParams">CredentialParams</a>) <a href="http://localhost:6060/pkg/builtin/#error">error</a></pre>
+				<p>
+OpenWithParams method are opens the component with given connection and credential parameters.
+</p>
+<pre>- correlationId     (optional) transaction id to trace execution through call chain.
+- connections        connection parameters
+- credential        credential parameters
+</pre>
+<p>
+Returns error or nil no errors occured.
+</p>
+
+				
+				
+				
+			
+				
+				<h3 id="MessageQueue.SendAsObject">func (*MessageQueue) <a href="http://localhost:6060/src/queues/MessageQueue.go?s=6450:6560#L160">SendAsObject</a>
 					<a class="permalink" href="index.html#MessageQueue.SendAsObject">&#xb6;</a>
 					
 					
@@ -1421,7 +1477,7 @@ See Send
 				
 			
 				
-				<h3 id="MessageQueue.SetReferences">func (*MessageQueue) <a href="http://localhost:6060/src/queues/MessageQueue.go?s=4280:4345#L100">SetReferences</a>
+				<h3 id="MessageQueue.SetReferences">func (*MessageQueue) <a href="http://localhost:6060/src/queues/MessageQueue.go?s=4284:4349#L100">SetReferences</a>
 					<a class="permalink" href="index.html#MessageQueue.SetReferences">&#xb6;</a>
 					
 					
@@ -1438,7 +1494,7 @@ SetReferences mmethod are sets references to dependent components.
 				
 			
 				
-				<h3 id="MessageQueue.String">func (*MessageQueue) <a href="http://localhost:6060/src/queues/MessageQueue.go?s=6888:6926#L172">String</a>
+				<h3 id="MessageQueue.String">func (*MessageQueue) <a href="http://localhost:6060/src/queues/MessageQueue.go?s=7386:7424#L182">String</a>
 					<a class="permalink" href="index.html#MessageQueue.String">&#xb6;</a>
 					
 					
