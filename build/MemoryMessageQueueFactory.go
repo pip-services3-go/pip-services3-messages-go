@@ -36,6 +36,14 @@ func NewMemoryMessageQueueFactory() *MemoryMessageQueueFactory {
 	return &c
 }
 
+func (c *MemoryMessageQueueFactory) Configure(config *cconf.ConfigParams) {
+	c.config = config
+}
+
+func (c *MemoryMessageQueueFactory) SetReferences(references cref.IReferences) {
+	c.references = references
+}
+
 // Creates a message queue component and assigns its name.
 //
 // Parameters:
