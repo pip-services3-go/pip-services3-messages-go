@@ -11,6 +11,7 @@ Improved message queues
 * **queues** Added CheckOpen method to MessageQueue
 * **queues** Added JSON serialization for MessageEnvelop
 * **build** Added IMessageQueueFactory interface
+* **build** Added MessageQueueFactory abstract class
 
 ## <a name="1.0.0"></a> 1.0.0 (2020-03-05)
 
