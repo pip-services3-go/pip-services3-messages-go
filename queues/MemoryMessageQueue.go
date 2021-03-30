@@ -4,9 +4,6 @@ import (
 	"fmt"
 	"sync/atomic"
 	"time"
-
-	"github.com/pip-services3-go/pip-services3-components-go/auth"
-	ccon "github.com/pip-services3-go/pip-services3-components-go/connect"
 )
 
 /*
@@ -75,12 +72,10 @@ func (c *MemoryMessageQueue) IsOpen() bool {
 //   - connection        connection parameters
 //   - credential        credential parameters
 // Retruns: error or nil no errors occured.
-func (c *MemoryMessageQueue) OpenWithParams(correlationId string, connections []*ccon.ConnectionParams,
-	credential *auth.CredentialParams) (err error) {
-
+func (c *MemoryMessageQueue) Open(correlationId string) (err error) {
 	c.opened = true
 
-	c.Logger.Trace(correlationId, "Opened queue %s", c.Name())
+	c.Logger.Debug(correlationId, "Opened queue %s", c.Name())
 
 	return nil
 }
@@ -92,7 +87,7 @@ func (c *MemoryMessageQueue) Close(correlationId string) (err error) {
 	c.opened = false
 	atomic.StoreInt32(&c.cancel, 1)
 
-	c.Logger.Trace(correlationId, "Closed queue %s", c.Name())
+	c.Logger.Debug(correlationId, "Closed queue %s", c.Name())
 
 	return nil
 }
