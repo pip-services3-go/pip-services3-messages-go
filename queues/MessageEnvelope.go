@@ -78,23 +78,36 @@ func (c *MessageEnvelope) SetMessageAsString(value string) {
 // GetMessageAsJson method are returns the value that was stored in this message as a JSON string.
 // See  SetMessageAsJson
 func (c *MessageEnvelope) GetMessageAsJson() interface{} {
-	if c.Message == nil {
-		return nil
-	}
-
 	var result interface{}
-	err := json.Unmarshal(c.Message, &result)
-	if err != nil {
-		return nil
-	}
-
-	return result
+	return c.GetMessageAs(result)
 }
 
 // SetMessageAsJson method are stores the given value as a JSON string.
 //   - value     the value to convert to JSON and store in this message.
 // See  GetMessageAsJson
 func (c *MessageEnvelope) SetMessageAsJson(value interface{}) {
+	c.SetMessageAsObject(value)
+}
+
+// GetMessageAs method are returns the value that was stored in this message as object.
+// See  SetMessageAsObject
+func (c *MessageEnvelope) GetMessageAs(value interface{}) interface{} {
+	if c.Message == nil {
+		return nil
+	}
+
+	err := json.Unmarshal(c.Message, &value)
+	if err != nil {
+		return nil
+	}
+
+	return value
+}
+
+// SetMessageAsJson method are stores the given value as a JSON string.
+//   - value     the value to convert to JSON and store in this message.
+// See  GetMessageAs
+func (c *MessageEnvelope) SetMessageAsObject(value interface{}) {
 	if value == nil {
 		c.Message = []byte{}
 	} else {
