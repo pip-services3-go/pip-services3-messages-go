@@ -418,7 +418,7 @@ See MessagingCapabilities
 </p>
 
 			<pre>type IMessageQueue interface {
-    <a href="http://localhost:6060/pkg/github.com/pip-services3-go/pip-services3-commons-go/run/">crun</a>.<a href="http://localhost:6060/pkg/github.com/pip-services3-go/pip-services3-commons-go/run/#IOpenable">IOpenable</a>
+    <a href="http://localhost:6060/pkg/github.com/pip-services3-gox/pip-services3-commons-go/run/">crun</a>.<a href="http://localhost:6060/pkg/github.com/pip-services3-gox/pip-services3-commons-go/run/#IOpenable">IOpenable</a>
 
     <span class="comment">// Name are gets the queue name</span>
     <span class="comment">// Return the queue name.</span>
@@ -540,7 +540,7 @@ See MessagingCapabilities
     <span class="comment">//  - connections        connection parameters</span>
     <span class="comment">//  - credential        credential parameters</span>
     <span class="comment">// Returns error or nil no errors occured.</span>
-    OpenWithParams(correlationId <a href="http://localhost:6060/pkg/builtin/#string">string</a>, connections []*<a href="http://localhost:6060/pkg/github.com/pip-services3-go/pip-services3-components-go/connect/">cconn</a>.<a href="http://localhost:6060/pkg/github.com/pip-services3-go/pip-services3-components-go/connect/#ConnectionParams">ConnectionParams</a>, credential *<a href="http://localhost:6060/pkg/github.com/pip-services3-go/pip-services3-components-go/auth/">cauth</a>.<a href="http://localhost:6060/pkg/github.com/pip-services3-go/pip-services3-components-go/auth/#CredentialParams">CredentialParams</a>) <a href="http://localhost:6060/pkg/builtin/#error">error</a>
+    OpenWithParams(correlationId <a href="http://localhost:6060/pkg/builtin/#string">string</a>, connections []*<a href="http://localhost:6060/pkg/github.com/pip-services3-gox/pip-services3-components-go/connect/">cconn</a>.<a href="http://localhost:6060/pkg/github.com/pip-services3-gox/pip-services3-components-go/connect/#ConnectionParams">ConnectionParams</a>, credential *<a href="http://localhost:6060/pkg/github.com/pip-services3-gox/pip-services3-components-go/auth/">cauth</a>.<a href="http://localhost:6060/pkg/github.com/pip-services3-gox/pip-services3-components-go/auth/#CredentialParams">CredentialParams</a>) <a href="http://localhost:6060/pkg/builtin/#error">error</a>
 }</pre>
 
 			
@@ -881,8 +881,8 @@ Returns: error or nil for success.
 					
 					
 				</h3>
-				<pre>func (c *<a href="index.html#MemoryMessageQueue">MemoryMessageQueue</a>) OpenWithParams(correlationId <a href="http://localhost:6060/pkg/builtin/#string">string</a>, connections []*<a href="http://localhost:6060/pkg/github.com/pip-services3-go/pip-services3-components-go/connect/">ccon</a>.<a href="http://localhost:6060/pkg/github.com/pip-services3-go/pip-services3-components-go/connect/#ConnectionParams">ConnectionParams</a>,
-    credential *<a href="http://localhost:6060/pkg/github.com/pip-services3-go/pip-services3-components-go/auth/">auth</a>.<a href="http://localhost:6060/pkg/github.com/pip-services3-go/pip-services3-components-go/auth/#CredentialParams">CredentialParams</a>) (err <a href="http://localhost:6060/pkg/builtin/#error">error</a>)</pre>
+				<pre>func (c *<a href="index.html#MemoryMessageQueue">MemoryMessageQueue</a>) OpenWithParams(correlationId <a href="http://localhost:6060/pkg/builtin/#string">string</a>, connections []*<a href="http://localhost:6060/pkg/github.com/pip-services3-gox/pip-services3-components-go/connect/">ccon</a>.<a href="http://localhost:6060/pkg/github.com/pip-services3-gox/pip-services3-components-go/connect/#ConnectionParams">ConnectionParams</a>,
+    credential *<a href="http://localhost:6060/pkg/github.com/pip-services3-gox/pip-services3-components-go/auth/">auth</a>.<a href="http://localhost:6060/pkg/github.com/pip-services3-gox/pip-services3-components-go/auth/#CredentialParams">CredentialParams</a>) (err <a href="http://localhost:6060/pkg/builtin/#error">error</a>)</pre>
 				<p>
 OpenWithParams method are opens the component with given connection and credential parameters.
 </p>
@@ -1280,10 +1280,10 @@ References:
 
 			<pre>type MessageQueue struct {
 <span id="MessageQueue.Overrides"></span>    Overrides          <a href="index.html#IMessageQueueOverrides">IMessageQueueOverrides</a>
-<span id="MessageQueue.Logger"></span>    Logger             *<a href="http://localhost:6060/pkg/github.com/pip-services3-go/pip-services3-components-go/log/">clog</a>.<a href="http://localhost:6060/pkg/github.com/pip-services3-go/pip-services3-components-go/log/#CompositeLogger">CompositeLogger</a>
-<span id="MessageQueue.Counters"></span>    Counters           *<a href="http://localhost:6060/pkg/github.com/pip-services3-go/pip-services3-components-go/count/">ccount</a>.<a href="http://localhost:6060/pkg/github.com/pip-services3-go/pip-services3-components-go/count/#CompositeCounters">CompositeCounters</a>
-<span id="MessageQueue.ConnectionResolver"></span>    ConnectionResolver *<a href="http://localhost:6060/pkg/github.com/pip-services3-go/pip-services3-components-go/connect/">cconn</a>.<a href="http://localhost:6060/pkg/github.com/pip-services3-go/pip-services3-components-go/connect/#ConnectionResolver">ConnectionResolver</a>
-<span id="MessageQueue.CredentialResolver"></span>    CredentialResolver *<a href="http://localhost:6060/pkg/github.com/pip-services3-go/pip-services3-components-go/auth/">cauth</a>.<a href="http://localhost:6060/pkg/github.com/pip-services3-go/pip-services3-components-go/auth/#CredentialResolver">CredentialResolver</a>
+<span id="MessageQueue.Logger"></span>    Logger             *<a href="http://localhost:6060/pkg/github.com/pip-services3-gox/pip-services3-components-go/log/">clog</a>.<a href="http://localhost:6060/pkg/github.com/pip-services3-gox/pip-services3-components-go/log/#CompositeLogger">CompositeLogger</a>
+<span id="MessageQueue.Counters"></span>    Counters           *<a href="http://localhost:6060/pkg/github.com/pip-services3-gox/pip-services3-components-go/count/">ccount</a>.<a href="http://localhost:6060/pkg/github.com/pip-services3-gox/pip-services3-components-go/count/#CompositeCounters">CompositeCounters</a>
+<span id="MessageQueue.ConnectionResolver"></span>    ConnectionResolver *<a href="http://localhost:6060/pkg/github.com/pip-services3-gox/pip-services3-components-go/connect/">cconn</a>.<a href="http://localhost:6060/pkg/github.com/pip-services3-gox/pip-services3-components-go/connect/#ConnectionResolver">ConnectionResolver</a>
+<span id="MessageQueue.CredentialResolver"></span>    CredentialResolver *<a href="http://localhost:6060/pkg/github.com/pip-services3-gox/pip-services3-components-go/auth/">cauth</a>.<a href="http://localhost:6060/pkg/github.com/pip-services3-gox/pip-services3-components-go/auth/#CredentialResolver">CredentialResolver</a>
 <span id="MessageQueue.Lock"></span>    Lock               <a href="http://localhost:6060/pkg/sync/">sync</a>.<a href="http://localhost:6060/pkg/sync/#Mutex">Mutex</a>
     <span class="comment">// contains filtered or unexported fields</span>
 }
@@ -1382,7 +1382,7 @@ Returns: error or null for success.
 					
 					
 				</h3>
-				<pre>func (c *<a href="index.html#MessageQueue">MessageQueue</a>) Configure(config *<a href="http://localhost:6060/pkg/github.com/pip-services3-go/pip-services3-commons-go/config/">cconf</a>.<a href="http://localhost:6060/pkg/github.com/pip-services3-go/pip-services3-commons-go/config/#ConfigParams">ConfigParams</a>)</pre>
+				<pre>func (c *<a href="index.html#MessageQueue">MessageQueue</a>) Configure(config *<a href="http://localhost:6060/pkg/github.com/pip-services3-gox/pip-services3-commons-go/config/">cconf</a>.<a href="http://localhost:6060/pkg/github.com/pip-services3-gox/pip-services3-commons-go/config/#ConfigParams">ConfigParams</a>)</pre>
 				<p>
 Configure method are configures component by passing configuration parameters.
 </p>
@@ -1435,8 +1435,8 @@ Returns: error or null no errors occured.
 					
 					
 				</h3>
-				<pre>func (c *<a href="index.html#MessageQueue">MessageQueue</a>) OpenWithParams(correlationId <a href="http://localhost:6060/pkg/builtin/#string">string</a>, connections []*<a href="http://localhost:6060/pkg/github.com/pip-services3-go/pip-services3-components-go/connect/">cconn</a>.<a href="http://localhost:6060/pkg/github.com/pip-services3-go/pip-services3-components-go/connect/#ConnectionParams">ConnectionParams</a>,
-    credential *<a href="http://localhost:6060/pkg/github.com/pip-services3-go/pip-services3-components-go/auth/">cauth</a>.<a href="http://localhost:6060/pkg/github.com/pip-services3-go/pip-services3-components-go/auth/#CredentialParams">CredentialParams</a>) <a href="http://localhost:6060/pkg/builtin/#error">error</a></pre>
+				<pre>func (c *<a href="index.html#MessageQueue">MessageQueue</a>) OpenWithParams(correlationId <a href="http://localhost:6060/pkg/builtin/#string">string</a>, connections []*<a href="http://localhost:6060/pkg/github.com/pip-services3-gox/pip-services3-components-go/connect/">cconn</a>.<a href="http://localhost:6060/pkg/github.com/pip-services3-gox/pip-services3-components-go/connect/#ConnectionParams">ConnectionParams</a>,
+    credential *<a href="http://localhost:6060/pkg/github.com/pip-services3-gox/pip-services3-components-go/auth/">cauth</a>.<a href="http://localhost:6060/pkg/github.com/pip-services3-gox/pip-services3-components-go/auth/#CredentialParams">CredentialParams</a>) <a href="http://localhost:6060/pkg/builtin/#error">error</a></pre>
 				<p>
 OpenWithParams method are opens the component with given connection and credential parameters.
 </p>
@@ -1482,7 +1482,7 @@ See Send
 					
 					
 				</h3>
-				<pre>func (c *<a href="index.html#MessageQueue">MessageQueue</a>) SetReferences(references <a href="http://localhost:6060/pkg/github.com/pip-services3-go/pip-services3-commons-go/refer/">cref</a>.<a href="http://localhost:6060/pkg/github.com/pip-services3-go/pip-services3-commons-go/refer/#IReferences">IReferences</a>)</pre>
+				<pre>func (c *<a href="index.html#MessageQueue">MessageQueue</a>) SetReferences(references <a href="http://localhost:6060/pkg/github.com/pip-services3-gox/pip-services3-commons-go/refer/">cref</a>.<a href="http://localhost:6060/pkg/github.com/pip-services3-gox/pip-services3-commons-go/refer/#IReferences">IReferences</a>)</pre>
 				<p>
 SetReferences mmethod are sets references to dependent components.
 </p>

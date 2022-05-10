@@ -1,9 +1,9 @@
 package build
 
 import (
-	cref "github.com/pip-services3-go/pip-services3-commons-go/refer"
-	cbuild "github.com/pip-services3-go/pip-services3-components-go/build"
-	"github.com/pip-services3-go/pip-services3-messaging-go/queues"
+	cref "github.com/pip-services3-gox/pip-services3-commons-gox/refer"
+	cbuild "github.com/pip-services3-gox/pip-services3-components-gox/build"
+	"github.com/pip-services3-gox/pip-services3-messaging-gox/queues"
 )
 
 // DefaultMessagingFactory Creates MemoryMessageQueue components by their descriptors.
@@ -23,7 +23,7 @@ func NewDefaultMessagingFactory() *DefaultMessagingFactory {
 	memoryQueueDescriptor := cref.NewDescriptor("pip-services", "message-queue", "memory", "*", "1.0")
 	memoryQueueFactoryDescriptor := cref.NewDescriptor("pip-services", "queue-factory", "memory", "*", "1.0")
 
-	c.Register(memoryQueueDescriptor, func(locator interface{}) interface{} {
+	c.Register(memoryQueueDescriptor, func(locator any) any {
 		name := ""
 		descriptor, ok := locator.(*cref.Descriptor)
 		if ok {

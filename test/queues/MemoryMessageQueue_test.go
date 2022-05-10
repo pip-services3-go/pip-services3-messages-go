@@ -1,18 +1,19 @@
 package test_queues
 
 import (
+	"context"
 	"testing"
 
-	"github.com/pip-services3-go/pip-services3-messaging-go/queues"
+	"github.com/pip-services3-gox/pip-services3-messaging-gox/queues"
 )
 
 func TestMemoryMessageQueue(t *testing.T) {
 	queue := queues.NewMemoryMessageQueue("TestQueue")
 	fixture := NewMessageQueueFixture(queue)
 
-	queue.Open("")
-	defer queue.Close("")
-	queue.Clear("")
+	queue.Open(context.TODO(), "")
+	defer queue.Close(context.TODO(), "")
+	queue.Clear(context.TODO(), "")
 
 	t.Run("MemoryMessageQueue:Send Receive Message", fixture.TestSendReceiveMessage)
 	t.Run("MemoryMessageQueue:Receive Send Message", fixture.TestReceiveSendMessage)

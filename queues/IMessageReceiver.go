@@ -1,5 +1,7 @@
 package queues
 
+import "context"
+
 /*
 IMessageReceiver callback interface to receive incoming messages.
 Example:
@@ -21,10 +23,10 @@ Example:
 type IMessageReceiver interface {
 
 	// ReceiveMessage method are receives incoming message from the queue.
+	//   - ctx       operation context
 	//   - envelope  an incoming message
 	//   - queue     a queue where the message comes from
-	//   - callback  callback function that receives error or null for success.
 	// See: MessageEnvelope
 	// See: IMessageQueue
-	ReceiveMessage(envelope *MessageEnvelope, queue IMessageQueue) (err error)
+	ReceiveMessage(ctx context.Context, envelope *MessageEnvelope, queue IMessageQueue) (err error)
 }

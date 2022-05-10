@@ -6,8 +6,8 @@ import (
 	"strings"
 	"time"
 
-	cconv "github.com/pip-services3-go/pip-services3-commons-go/convert"
-	cdata "github.com/pip-services3-go/pip-services3-commons-go/data"
+	cconv "github.com/pip-services3-gox/pip-services3-commons-gox/convert"
+	cdata "github.com/pip-services3-gox/pip-services3-commons-gox/data"
 )
 
 /*
@@ -17,18 +17,12 @@ Side note: a MessageEnvelope"s message is stored as a buffer, so strings are con
 using utf8 conversions.
 */
 type MessageEnvelope struct {
-	reference interface{}
-
-	//The unique business transaction id that is used to trace calls across components.
-	CorrelationId string `json:"correlation_id"`
-	// The message"s auto-generated ID.
-	MessageId string `json:"message_id"`
-	// String value that defines the stored message"s type.
-	MessageType string `json:"message_type"`
-	// The time at which the message was sent.
-	SentTime time.Time `json:"sent_time"`
-	//The stored message.
-	Message []byte `json:"message"`
+	reference     interface{}
+	CorrelationId string    `json:"correlation_id"` //The unique business transaction id that is used to trace calls across components.
+	MessageId     string    `json:"message_id"`     // The message"s auto-generated ID.
+	MessageType   string    `json:"message_type"`   // String value that defines the stored message"s type.
+	SentTime      time.Time `json:"sent_time"`      // The time at which the message was sent.
+	Message       []byte    `json:"message"`        //The stored message.
 }
 
 // NewMessageEnvelope method are creates an empty MessageEnvelope

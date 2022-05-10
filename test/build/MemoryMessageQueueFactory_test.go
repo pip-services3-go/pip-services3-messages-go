@@ -3,9 +3,9 @@ package test_build
 import (
 	"testing"
 
-	cref "github.com/pip-services3-go/pip-services3-commons-go/refer"
-	build "github.com/pip-services3-go/pip-services3-messaging-go/build"
-	queues "github.com/pip-services3-go/pip-services3-messaging-go/queues"
+	cref "github.com/pip-services3-gox/pip-services3-commons-gox/refer"
+	build "github.com/pip-services3-gox/pip-services3-messaging-gox/build"
+	queues "github.com/pip-services3-gox/pip-services3-messaging-gox/queues"
 	"github.com/stretchr/testify/assert"
 )
 
