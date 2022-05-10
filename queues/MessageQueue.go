@@ -1,6 +1,7 @@
 package queues
 
 import (
+	"context"
 	"sync"
 
 	cconf "github.com/pip-services3-gox/pip-services3-commons-gox/config"
@@ -20,7 +21,7 @@ type IMessageQueueOverrides interface {
 	//  - connections        connection parameters
 	//  - credential        credential parameters
 	// Returns error or nil no errors occured.
-	OpenWithParams(correlationId string, connections []*cconn.ConnectionParams, credential *cauth.CredentialParams) error
+	OpenWithParams(ctx context.Context, correlationId string, connections []*cconn.ConnectionParams, credential *cauth.CredentialParams) error
 }
 
 /*
@@ -96,28 +97,30 @@ func (c *MessageQueue) Capabilities() *MessagingCapabilities {
 
 // Configure method are configures component by passing configuration parameters.
 //   - config    configuration parameters to be set.
-func (c *MessageQueue) Configure(config *cconf.ConfigParams) {
-	c.Logger.Configure(config)
-	c.ConnectionResolver.Configure(config)
-	c.CredentialResolver.Configure(config)
+func (c *MessageQueue) Configure(ctx context.Context, config *cconf.ConfigParams) {
+	c.Logger.Configure(ctx, config)
+	c.ConnectionResolver.Configure(ctx, config)
+	c.CredentialResolver.Configure(ctx, config)
 
 	c.name = cconf.NameResolver.ResolveWithDefault(config, c.name)
 	c.name = config.GetAsStringWithDefault("queue", c.name)
 }
 
 // SetReferences mmethod are sets references to dependent components.
+//   - ctx 			operation context
 //   - references 	references to locate the component dependencies.
-func (c *MessageQueue) SetReferences(references cref.IReferences) {
-	c.Logger.SetReferences(references)
-	c.Counters.SetReferences(references)
-	c.ConnectionResolver.SetReferences(references)
-	c.CredentialResolver.SetReferences(references)
+func (c *MessageQueue) SetReferences(ctx context.Context, references cref.IReferences) {
+	c.Logger.SetReferences(ctx, references)
+	c.Counters.SetReferences(ctx, references)
+	c.ConnectionResolver.SetReferences(ctx, references)
+	c.CredentialResolver.SetReferences(ctx, references)
 }
 
 // Open method are opens the component.
+//   - ctx 			    operation context
 //   - correlationId 	(optional) transaction id to trace execution through call chain.
 // Returns: error or null no errors occured.
-func (c *MessageQueue) Open(correlationId string) error {
+func (c *MessageQueue) Open(ctx context.Context, correlationId string) error {
 	connections, err := c.ConnectionResolver.ResolveAll(correlationId)
 	if err != nil {
 		return err
@@ -127,20 +130,21 @@ func (c *MessageQueue) Open(correlationId string) error {
 		return err
 	}
 
-	credential, err := c.CredentialResolver.Lookup(correlationId)
+	credential, err := c.CredentialResolver.Lookup(ctx, correlationId)
 	if err != nil {
 		return err
 	}
 
-	return c.Overrides.OpenWithParams(correlationId, connections, credential)
+	return c.Overrides.OpenWithParams(ctx, correlationId, connections, credential)
 }
 
 // OpenWithParams method are opens the component with given connection and credential parameters.
+//  - ctx 			    operation context
 //  - correlationId     (optional) transaction id to trace execution through call chain.
 //  - connections        connection parameters
-//  - credential        credential parameters
+//  - credential         credential parameters
 // Returns error or nil no errors occured.
-func (c *MessageQueue) OpenWithParams(correlationId string, connections []*cconn.ConnectionParams,
+func (c *MessageQueue) OpenWithParams(ctx context.Context, correlationId string, connections []*cconn.ConnectionParams,
 	credential *cauth.CredentialParams) error {
 	panic("Not supported")
 }
@@ -162,27 +166,29 @@ func (c *MessageQueue) CheckOpen(correlationId string) error {
 
 // SendAsObject method are sends an object into the queue.
 // Before sending the object is converted into JSON string and wrapped in a MessageEnvelop.
+//   - ctx 			     operation context
 //   - correlationId     (optional) transaction id to trace execution through call chain.
 //   - messageType       a message type
 //   - value             an object value to be sent
-// Returns: error or null for success.
+// Returns: error or nil for success.
 // See Send
-func (c *MessageQueue) SendAsObject(correlationId string, messageType string, message interface{}) (err error) {
+func (c *MessageQueue) SendAsObject(ctx context.Context, correlationId string, messageType string, message interface{}) (err error) {
 	envelope := NewMessageEnvelope(correlationId, messageType, nil)
 	envelope.SetMessageAsJson(message)
-	return c.Overrides.Send(correlationId, envelope)
+	return c.Overrides.Send(ctx, correlationId, envelope)
 }
 
 // BeginListen method are listens for incoming messages without blocking the current thread.
+//   - ctx 			     operation context
 //   - correlationId     (optional) transaction id to trace execution through call chain.
 //   - receiver          a receiver to receive incoming messages.
 // See Listen
 // See IMessageReceiver
-func (c *MessageQueue) BeginListen(correlationId string, receiver IMessageReceiver) {
+func (c *MessageQueue) BeginListen(ctx context.Context, correlationId string, receiver IMessageReceiver) {
 	go func() {
-		err := c.Overrides.Listen(correlationId, receiver)
+		err := c.Overrides.Listen(ctx, correlationId, receiver)
 		if err != nil {
-			c.Logger.Error(correlationId, err, "Failed to listed the message queue "+c.Name())
+			c.Logger.Error(ctx, correlationId, err, "Failed to listed the message queue "+c.Name())
 		}
 	}()
 }

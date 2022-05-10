@@ -1,6 +1,8 @@
 package build
 
 import (
+	"context"
+
 	cconf "github.com/pip-services3-gox/pip-services3-commons-gox/config"
 	cref "github.com/pip-services3-gox/pip-services3-commons-gox/refer"
 	"github.com/pip-services3-gox/pip-services3-components-gox/build"
@@ -25,10 +27,10 @@ func InheritMessageQueueFactory() *MessageQueueFactory {
 	return &c
 }
 
-func (c *MessageQueueFactory) Configure(config *cconf.ConfigParams) {
+func (c *MessageQueueFactory) Configure(ctx context.Context, config *cconf.ConfigParams) {
 	c.Config = config
 }
 
-func (c *MessageQueueFactory) SetReferences(references cref.IReferences) {
+func (c *MessageQueueFactory) SetReferences(ctx context.Context, references cref.IReferences) {
 	c.References = references
 }

@@ -23,7 +23,7 @@ func NewDefaultMessagingFactory() *DefaultMessagingFactory {
 	memoryQueueDescriptor := cref.NewDescriptor("pip-services", "message-queue", "memory", "*", "1.0")
 	memoryQueueFactoryDescriptor := cref.NewDescriptor("pip-services", "queue-factory", "memory", "*", "1.0")
 
-	c.Register(memoryQueueDescriptor, func(locator interface{}) interface{} {
+	c.Register(memoryQueueDescriptor, func(locator any) any {
 		name := ""
 		descriptor, ok := locator.(*cref.Descriptor)
 		if ok {
