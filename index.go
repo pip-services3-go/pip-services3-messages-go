@@ -1,6 +1,6 @@
 package messages
 
 import (
-	_ "github.com/pip-services3-go/pip-services3-messaging-go/build"
-	_ "github.com/pip-services3-go/pip-services3-messaging-go/queues"
+	_ "github.com/pip-services3-gox/pip-services3-messaging-gox/build"
+	_ "github.com/pip-services3-gox/pip-services3-messaging-gox/queues"
 )

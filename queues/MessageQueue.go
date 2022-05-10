@@ -3,13 +3,13 @@ package queues
 import (
 	"sync"
 
-	cconf "github.com/pip-services3-go/pip-services3-commons-go/config"
-	cerr "github.com/pip-services3-go/pip-services3-commons-go/errors"
-	cref "github.com/pip-services3-go/pip-services3-commons-go/refer"
-	cauth "github.com/pip-services3-go/pip-services3-components-go/auth"
-	cconn "github.com/pip-services3-go/pip-services3-components-go/connect"
-	ccount "github.com/pip-services3-go/pip-services3-components-go/count"
-	clog "github.com/pip-services3-go/pip-services3-components-go/log"
+	cconf "github.com/pip-services3-gox/pip-services3-commons-gox/config"
+	cerr "github.com/pip-services3-gox/pip-services3-commons-gox/errors"
+	cref "github.com/pip-services3-gox/pip-services3-commons-gox/refer"
+	cauth "github.com/pip-services3-gox/pip-services3-components-gox/auth"
+	cconn "github.com/pip-services3-gox/pip-services3-components-gox/connect"
+	ccount "github.com/pip-services3-gox/pip-services3-components-gox/count"
+	clog "github.com/pip-services3-gox/pip-services3-components-gox/log"
 )
 
 type IMessageQueueOverrides interface {

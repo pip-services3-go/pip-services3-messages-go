@@ -1,9 +1,9 @@
 package build
 
 import (
-	cref "github.com/pip-services3-go/pip-services3-commons-go/refer"
-	cbuild "github.com/pip-services3-go/pip-services3-components-go/build"
-	"github.com/pip-services3-go/pip-services3-messaging-go/queues"
+	cref "github.com/pip-services3-gox/pip-services3-commons-gox/refer"
+	cbuild "github.com/pip-services3-gox/pip-services3-components-gox/build"
+	"github.com/pip-services3-gox/pip-services3-messaging-gox/queues"
 )
 
 // DefaultMessagingFactory Creates MemoryMessageQueue components by their descriptors.

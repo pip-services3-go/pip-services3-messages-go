@@ -1,8 +1,8 @@
 package build
 
 import (
-	cref "github.com/pip-services3-go/pip-services3-commons-go/refer"
-	"github.com/pip-services3-go/pip-services3-messaging-go/queues"
+	cref "github.com/pip-services3-gox/pip-services3-commons-gox/refer"
+	"github.com/pip-services3-gox/pip-services3-messaging-gox/queues"
 )
 
 // MemoryMessageQueueFactory are creates MemoryMemoryMessageQueue components by their descriptors.

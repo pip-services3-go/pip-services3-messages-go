@@ -1,9 +1,9 @@
 package build
 
 import (
-	cconf "github.com/pip-services3-go/pip-services3-commons-go/config"
-	cref "github.com/pip-services3-go/pip-services3-commons-go/refer"
-	"github.com/pip-services3-go/pip-services3-components-go/build"
+	cconf "github.com/pip-services3-gox/pip-services3-commons-gox/config"
+	cref "github.com/pip-services3-gox/pip-services3-commons-gox/refer"
+	"github.com/pip-services3-gox/pip-services3-components-gox/build"
 )
 
 // MessageQueueFactory are creates MessageQueue components by their descriptors.
