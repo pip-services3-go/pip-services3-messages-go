@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"testing"
 
-	"github.com/pip-services3-gox/pip-services3-messaging-gox/queues"
+	"github.com/pip-services3-go/pip-services3-messaging-go/queues"
 	"github.com/stretchr/testify/assert"
 )
 

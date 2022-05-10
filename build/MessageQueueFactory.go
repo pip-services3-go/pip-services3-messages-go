@@ -1,11 +1,9 @@
 package build
 
 import (
-	"context"
-
-	cconf "github.com/pip-services3-gox/pip-services3-commons-gox/config"
-	cref "github.com/pip-services3-gox/pip-services3-commons-gox/refer"
-	"github.com/pip-services3-gox/pip-services3-components-gox/build"
+	cconf "github.com/pip-services3-go/pip-services3-commons-go/config"
+	cref "github.com/pip-services3-go/pip-services3-commons-go/refer"
+	"github.com/pip-services3-go/pip-services3-components-go/build"
 )
 
 // MessageQueueFactory are creates MessageQueue components by their descriptors.
@@ -27,10 +25,10 @@ func InheritMessageQueueFactory() *MessageQueueFactory {
 	return &c
 }
 
-func (c *MessageQueueFactory) Configure(ctx context.Context, config *cconf.ConfigParams) {
+func (c *MessageQueueFactory) Configure(config *cconf.ConfigParams) {
 	c.Config = config
 }
 
-func (c *MessageQueueFactory) SetReferences(ctx context.Context, references cref.IReferences) {
+func (c *MessageQueueFactory) SetReferences(references cref.IReferences) {
 	c.References = references
 }
