@@ -6,13 +6,13 @@ The Messaging module contains a set of interfaces and classes for working with m
 
 The module contains the following packages:
 
-- [**Build**](https://godoc.org/github.com/pip-services3-gox/pip-services3-messaging-go/build) - in-memory message queue factory
-- [**Queues**](https://godoc.org/github.com/pip-services3-gox/pip-services3-messaging-go/queues) - contains interfaces for working with message queues, subscriptions for receiving messages from the queue, and an in-memory message queue implementation.
+- [**Build**](https://godoc.org/github.com/pip-services3-go/pip-services3-messaging-go/build) - in-memory message queue factory
+- [**Queues**](https://godoc.org/github.com/pip-services3-go/pip-services3-messaging-go/queues) - contains interfaces for working with message queues, subscriptions for receiving messages from the queue, and an in-memory message queue implementation.
 
 <a name="links"></a> Quick links:
 
 * [Configuration](https://www.pipservices.org/recipies/configuration)
-* [API Reference](https://godoc.org/github.com/pip-services3-gox/pip-services3-messaging-go/)
+* [API Reference](https://godoc.org/github.com/pip-services3-go/pip-services3-messaging-go/)
 * [Change Log](CHANGELOG.md)
 * [Get Help](https://www.pipservices.org/community/help)
 * [Contribute](https://www.pipservices.org/community/contribute)
@@ -21,13 +21,13 @@ The module contains the following packages:
 
 Get the package from the Github repository:
 ```bash
-go get -u github.com/pip-services3-gox/pip-services3-messaging-go@latest
+go get -u github.com/pip-services3-go/pip-services3-messaging-go@latest
 ```
 
 ## Develop
 
 For development you shall install the following prerequisites:
-* Golang v1.18+
+* Golang v1.12+
 * Visual Studio Code or another IDE of your choice
 * Docker
 * Git
