@@ -13,7 +13,7 @@ WORKDIR /app
 COPY go.mod ./
 
 # Install all go_modules
-RUN go mod download
+RUN go mod tidy
 
 # Copy the entire project
 COPY . .
